@@ -8,14 +8,13 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 
 /**
- * An example element.
+ * An element.
  *
- * @fires count-changed - Indicates when the count changes
  * @slot - This element has a slot
  * @csspart button - The button
  */
-@customElement('my-element')
-export class MyElement extends LitElement {
+@customElement('shogi-player')
+export class ShogiPlayer extends LitElement {
   static override styles = css`
     :host {
       display: block;
@@ -29,27 +28,13 @@ export class MyElement extends LitElement {
    * The name to say "Hello" to.
    */
   @property()
-  name = 'World';
-
-  /**
-   * The number of times the button has been clicked.
-   */
-  @property({type: Number})
-  count = 0;
+  name = 'Shogi Player';
 
   override render() {
     return html`
       <h1>${this.sayHello(this.name)}!</h1>
-      <button @click=${this._onClick} part="button">
-        Click Count: ${this.count}
-      </button>
       <slot></slot>
     `;
-  }
-
-  private _onClick() {
-    this.count++;
-    this.dispatchEvent(new CustomEvent('count-changed'));
   }
 
   /**
@@ -63,6 +48,6 @@ export class MyElement extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'my-element': MyElement;
+    'shogi-player': ShogiPlayer;
   }
 }
