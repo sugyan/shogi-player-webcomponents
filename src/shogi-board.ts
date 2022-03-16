@@ -1,7 +1,9 @@
 import { LitElement, html, css } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
+import { styleMap } from "lit/directives/style-map.js";
 import { BOARD_NULL } from "./constants";
-import { Board, Piece } from "./types";
+import { Board, BoardCol, BoardRow, Piece, Square } from "./types";
+import { rc2sq, sq2rc, nextPiece } from "./utils";
 import { bfu } from "./resources/bfu";
 import { bky } from "./resources/bky";
 import { bke } from "./resources/bke";
@@ -74,13 +76,27 @@ export class ShogiBoard extends LitElement {
 
   @property({ type: Array, attribute: true }) board: Board = BOARD_NULL;
 
+  @state() private _selected: Square | null = null;
+
   override render() {
     return html`<table>
-      ${this.board.map((row) => {
+      ${this.board.map((row: BoardRow, i: number) => {
         return html`<tr>
-          ${row.map((col: Piece | null) => {
-            return html`<td>
-              <div class="shogi-cell">${this.pieceImage(col)}</div>
+          ${row.map((col: BoardCol, j: number) => {
+            const sq = rc2sq(i, j);
+            const styles = {
+              cursor:
+                this._selected !== null || col !== null ? "pointer" : "default",
+              backgroundColor: this.isSelected(sq) ? "gold" : "",
+            };
+            return html`<td style=${styleMap(styles)}>
+              <div
+                class="shogi-cell"
+                @click=${() => this.cellClicked(sq)}
+                @dblclick=${() => this.cellDoubleClicked(sq)}
+              >
+                ${this.pieceImage(col)}
+              </div>
             </td>`;
           })}
         </tr>`;
@@ -88,6 +104,40 @@ export class ShogiBoard extends LitElement {
     </table>`;
   }
 
+  private cellClicked(sq: Square) {
+    const [row, col] = sq2rc(sq);
+    if (this._selected !== null) {
+      if (this.isSelected(sq)) {
+        this._selected = null;
+      } else {
+        const [selrow, selcol] = sq2rc(this._selected);
+        const piece = this.board[selrow][selcol];
+        this.board[selrow][selcol] = null;
+        this.board[row][col] = piece;
+        this._selected = null;
+        this.requestUpdate("board");
+      }
+    } else {
+      if (this.board[row][col] !== null) {
+        this._selected = sq;
+      }
+    }
+  }
+  private cellDoubleClicked(sq: Square) {
+    const [row, col] = sq2rc(sq);
+    const piece = this.board[row][col];
+    if (piece !== null) {
+      this.board[row][col] = nextPiece(piece);
+      this.requestUpdate("board");
+    }
+  }
+  private isSelected(sq: Square): boolean {
+    return (
+      this._selected !== null &&
+      this._selected.file === sq.file &&
+      this._selected.rank === sq.rank
+    );
+  }
   private pieceImage(piece: Piece | null) {
     switch (piece) {
       case Piece.BFU:
