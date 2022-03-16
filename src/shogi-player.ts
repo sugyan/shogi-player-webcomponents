@@ -6,15 +6,15 @@
 
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { ShogiBoard } from "../shogi-board";
-import { Board, Piece } from "./types";
+import { ShogiBoard } from "./shogi-board";
+import { BOARD_INIT, BOARD_NULL } from "./constants";
+import { Board } from "./types";
 import "./shogi-board";
 
 /**
  * An element.
  *
  * @slot - This element has a slot
- * @csspart button - The button
  */
 @customElement("shogi-player")
 export class ShogiPlayer extends LitElement {
@@ -23,38 +23,21 @@ export class ShogiPlayer extends LitElement {
       display: block;
       border: solid 1px gray;
       padding: 16px;
-      max-width: 800px;
     }
   `;
 
-  private constructor() {
-    super();
-    // prettier-ignore
-    this._board = [
-      [Piece.WKY, Piece.WKE, Piece.WGI, Piece.WKI, Piece.WOU, Piece.WKI, Piece.WGI, Piece.WKE, Piece.WKY],
-      [     null, Piece.WHI,      null,      null,      null,      null,      null, Piece.WKA,      null],
-      [Piece.WFU, Piece.WFU, Piece.WFU, Piece.WFU, Piece.WFU, Piece.WFU, Piece.WFU, Piece.WFU, Piece.WFU],
-      [     null,      null,      null,      null,      null,      null,      null,      null,      null],
-      [     null,      null,      null,      null,      null,      null,      null,      null,      null],
-      [     null,      null,      null,      null,      null,      null,      null,      null,      null],
-      [Piece.BFU, Piece.BFU, Piece.BFU, Piece.BFU, Piece.BFU, Piece.BFU, Piece.BFU, Piece.BFU, Piece.BFU],
-      [     null, Piece.BKA,      null,      null,      null,      null,      null, Piece.BHI,      null],
-      [Piece.BKY, Piece.BKE, Piece.BGI, Piece.BKI, Piece.BOU, Piece.BKI, Piece.BGI, Piece.BKE, Piece.BKY],
-    ];
-  }
-
   @state()
-  private _board: Board;
+  private _board: Board = BOARD_INIT;
 
   /**
-   * The name to say "Hello" to.
+   * The title of shogi player
    */
-  @property()
-  name = "Shogi Player";
+  @property({ type: String })
+  override title = "";
 
   override render() {
     return html`
-      <h1>${this.sayHello(this.name)}!</h1>
+      <div>${this.title}</div>
       <shogi-board .board=${this._board}></shogi-board>
       <button @click="${() => this.clearBoard()}">Clear Board</button>
       <slot></slot>
@@ -62,25 +45,7 @@ export class ShogiPlayer extends LitElement {
   }
 
   private clearBoard() {
-    this._board = [
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-    ];
-  }
-
-  /**
-   * Formats a greeting
-   * @param name The name to say "Hello" to
-   */
-  sayHello(name: string): string {
-    return `Hello, ${name}`;
+    this._board = BOARD_NULL;
   }
 }
 
