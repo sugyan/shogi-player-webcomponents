@@ -1,4 +1,32 @@
 import { File, Rank, Square, Piece } from "./types";
+import { bfu } from "./resources/bfu";
+import { bky } from "./resources/bky";
+import { bke } from "./resources/bke";
+import { bgi } from "./resources/bgi";
+import { bki } from "./resources/bki";
+import { bka } from "./resources/bka";
+import { bhi } from "./resources/bhi";
+import { bou } from "./resources/bou";
+import { bto } from "./resources/bto";
+import { bny } from "./resources/bny";
+import { bnk } from "./resources/bnk";
+import { bng } from "./resources/bng";
+import { bum } from "./resources/bum";
+import { bry } from "./resources/bry";
+import { wfu } from "./resources/wfu";
+import { wky } from "./resources/wky";
+import { wke } from "./resources/wke";
+import { wgi } from "./resources/wgi";
+import { wki } from "./resources/wki";
+import { wka } from "./resources/wka";
+import { whi } from "./resources/whi";
+import { wou } from "./resources/wou";
+import { wto } from "./resources/wto";
+import { wny } from "./resources/wny";
+import { wnk } from "./resources/wnk";
+import { wng } from "./resources/wng";
+import { wum } from "./resources/wum";
+import { wry } from "./resources/wry";
 
 const FILES = [
   File.File1,
@@ -148,4 +176,66 @@ export function nextPiece(piece: Piece): Piece {
     case Piece.WRY:
       return Piece.BHI;
   }
+}
+
+export function pieceImage(piece: Piece | null) {
+  switch (piece) {
+    case Piece.BFU:
+      return bfu;
+    case Piece.BKY:
+      return bky;
+    case Piece.BKE:
+      return bke;
+    case Piece.BGI:
+      return bgi;
+    case Piece.BKI:
+      return bki;
+    case Piece.BKA:
+      return bka;
+    case Piece.BHI:
+      return bhi;
+    case Piece.BOU:
+      return bou;
+    case Piece.BTO:
+      return bto;
+    case Piece.BNY:
+      return bny;
+    case Piece.BNK:
+      return bnk;
+    case Piece.BNG:
+      return bng;
+    case Piece.BUM:
+      return bum;
+    case Piece.BRY:
+      return bry;
+    case Piece.WFU:
+      return wfu;
+    case Piece.WKY:
+      return wky;
+    case Piece.WKE:
+      return wke;
+    case Piece.WGI:
+      return wgi;
+    case Piece.WKI:
+      return wki;
+    case Piece.WKA:
+      return wka;
+    case Piece.WHI:
+      return whi;
+    case Piece.WOU:
+      return wou;
+    case Piece.WTO:
+      return wto;
+    case Piece.WNY:
+      return wny;
+    case Piece.WNK:
+      return wnk;
+    case Piece.WNG:
+      return wng;
+    case Piece.WUM:
+      return wum;
+    case Piece.WRY:
+      return wry;
+  }
+  return null;
 }

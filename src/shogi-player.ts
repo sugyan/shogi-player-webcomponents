@@ -7,9 +7,10 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { ShogiBoard } from "./shogi-board";
-import { BOARD_INIT, BOARD_NULL } from "./constants";
-import { Board } from "./types";
+import { BOARD_INIT, BOARD_NULL, HAND_ZERO, HAND_ALL } from "./constants";
+import { Color, Board, Hand } from "./types";
 import "./shogi-board";
+import "./shogi-hand";
 
 /**
  * An element.
@@ -20,14 +21,24 @@ import "./shogi-board";
 export class ShogiPlayer extends LitElement {
   static override styles = css`
     :host {
+      width: 600px;
       display: block;
       border: solid 1px gray;
       padding: 16px;
+      font-family: sans-serif;
+    }
+    .shogi-player {
+      display: flex;
+      align-items: center;
     }
   `;
 
   @state()
   private _board: Board = BOARD_INIT;
+  @state()
+  private _hand_black: Hand = HAND_ZERO;
+  @state()
+  private _hand_white: Hand = HAND_ZERO;
 
   /**
    * The title of shogi player
@@ -38,7 +49,19 @@ export class ShogiPlayer extends LitElement {
   override render() {
     return html`
       <div>${this.title}</div>
-      <shogi-board .board=${this._board}></shogi-board>
+      <div class="shogi-player">
+        <shogi-hand
+          class="white"
+          color=${Color.White}
+          .hand=${this._hand_white}
+        ></shogi-hand>
+        <shogi-board .board=${this._board}></shogi-board>
+        <shogi-hand
+          class="black"
+          color=${Color.Black}
+          .hand=${this._hand_black}
+        ></shogi-hand>
+      </div>
       <button @click="${() => this.clearBoard()}">Clear Board</button>
       <slot></slot>
     `;
@@ -46,6 +69,8 @@ export class ShogiPlayer extends LitElement {
 
   private clearBoard() {
     this._board = BOARD_NULL;
+    this._hand_black = HAND_ALL;
+    this._hand_white = HAND_ALL;
   }
 }
 

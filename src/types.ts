@@ -1,3 +1,10 @@
+export const Color = {
+  Black: "black",
+  White: "white",
+  None: "",
+} as const;
+export type Color = typeof Color[keyof typeof Color];
+
 export const File = {
   File1: 1,
   File2: 2,
@@ -28,6 +35,28 @@ export interface Square {
   file: File;
   rank: Rank;
 }
+
+export const PieceType = {
+  FU: "FU",
+  KY: "KY",
+  KE: "KE",
+  GI: "GI",
+  KI: "KI",
+  KA: "KA",
+  HI: "HI",
+  OU: "OU",
+  TO: "TO",
+  NY: "NY",
+  NK: "NK",
+  NG: "NG",
+  UM: "UM",
+  RY: "RY",
+} as const;
+export type PieceType = typeof PieceType[keyof typeof PieceType];
+export type HandPieceType = Extract<
+  PieceType,
+  "FU" | "KY" | "KE" | "GI" | "KI" | "KA" | "HI" | "OU"
+>;
 
 export const Piece = {
   BFU: "BFU",
@@ -86,3 +115,5 @@ export type Board = [
   BoardRow,
   BoardRow
 ];
+
+export type Hand = { [key in HandPieceType]: number };
