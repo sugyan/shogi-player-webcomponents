@@ -2,8 +2,4 @@
 /lib/
 /test/
 custom-elements.json
-# top level source
-shogi-player.js
-shogi-player.js.map
-shogi-player.d.ts
-shogi-player.d.ts.map
+/dist/

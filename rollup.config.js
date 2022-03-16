@@ -10,9 +10,9 @@ import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 
 export default {
-  input: 'shogi-player.js',
+  input: './dist/shogi-player.js',
   output: {
-    file: 'shogi-player.bundled.js',
+    file: './dist/shogi-player.bundled.js',
     format: 'esm',
   },
   onwarn(warning) {
