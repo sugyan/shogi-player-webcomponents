@@ -75,13 +75,7 @@ export class ShogiBoard extends LitElement {
   }
 
   private _clickHandler(sq: Square) {
-    const [row, col] = sq2rc(sq);
-    const piece = this.board[row][col];
-    if (this.selected !== null || piece !== null) {
-      this.dispatchEvent(
-        new CustomEvent("cell-clicked", { detail: { sq, piece } })
-      );
-    }
+    this.dispatchEvent(new CustomEvent("cell-clicked", { detail: { sq } }));
   }
   private _dblclickHandler(sq: Square) {
     const [row, col] = sq2rc(sq);

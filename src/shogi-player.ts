@@ -69,12 +69,16 @@ export class ShogiPlayer extends LitElement {
             class="white"
             color=${Color.White}
             .hand=${this._hand_white}
+            .selected=${this._selected !== null && this._selected.sq === null
+              ? this._selected.piece
+              : null}
+            @hand-clicked=${this._handPieceClickHandler}
           ></shogi-hand>
         </div>
         <shogi-board
           @cell-clicked=${this._cellClickHandler}
           .board=${this._board}
-          .selected=${this._selected ? this._selected.sq : null}
+          .selected=${this._selected !== null ? this._selected.sq : null}
         ></shogi-board>
         <div
           class="shogi-hand"
@@ -84,6 +88,10 @@ export class ShogiPlayer extends LitElement {
             class="black"
             color=${Color.Black}
             .hand=${this._hand_black}
+            .selected=${this._selected !== null && this._selected.sq === null
+              ? this._selected.piece
+              : null}
+            @hand-clicked=${this._handPieceClickHandler}
           ></shogi-hand>
         </div>
       </div>
@@ -92,37 +100,78 @@ export class ShogiPlayer extends LitElement {
     `;
   }
   private _handAreaClickHandler(c: Color) {
-    console.log(c);
-  }
-  private _cellClickHandler(e: CustomEvent<{ sq: Square; piece: Piece }>) {
-    if (this._selected === null) {
-      this._selected = e.detail;
-    } else {
-      if (this._selected.sq === null) {
-        // TODO
-      } else {
-        if (!e.detail.sq.equals(this._selected.sq)) {
-          const [rowsrc, colsrc] = sq2rc(this._selected.sq);
-          const [rowdst, coldst] = sq2rc(e.detail.sq);
-          const p = this._board[rowdst][coldst];
-          this._board[rowsrc][colsrc] = null;
-          this._board[rowdst][coldst] = this._selected.piece;
-          if (p !== null) {
-            const [csrc] = p2cpt(this._selected.piece);
-            const [, ptdst] = p2cpt(p);
-            if (csrc === Color.Black) {
-              this._hand_black[pt2hpt(ptdst)] += 1;
-              this._hand_black = { ...this._hand_black };
-            }
-            if (csrc === Color.White) {
-              this._hand_white[pt2hpt(ptdst)] += 1;
-              this._hand_white = { ...this._hand_white };
-            }
-          }
+    if (this._selected) {
+      if (this._selected.sq !== null) {
+        const [row, col] = sq2rc(this._selected.sq);
+        const [, pt] = p2cpt(this._selected.piece);
+        this._board[row][col] = null;
+        if (c === Color.Black) {
+          this._hand_black[pt2hpt(pt)] += 1;
+          this._hand_black = { ...this._hand_black };
+        }
+        if (c === Color.White) {
+          this._hand_white[pt2hpt(pt)] += 1;
+          this._hand_white = { ...this._hand_white };
         }
         this._selected = null;
       }
     }
+  }
+  private _cellClickHandler(e: CustomEvent<{ sq: Square }>) {
+    const [rowdst, coldst] = sq2rc(e.detail.sq);
+    const piece = this._board[rowdst][coldst];
+    if (this._selected === null) {
+      if (piece !== null) {
+        this._selected = { sq: e.detail.sq, piece };
+      }
+    } else {
+      const [csrc, ptsrc] = p2cpt(this._selected.piece);
+      if (this._selected.sq !== null) {
+        if (e.detail.sq.equals(this._selected.sq)) {
+          this._selected = null;
+          return;
+        } else {
+          const [rowsrc, colsrc] = sq2rc(this._selected.sq);
+          this._board[rowsrc][colsrc] = null;
+          this._board[rowdst][coldst] = this._selected.piece;
+        }
+      } else {
+        this._board[rowdst][coldst] = this._selected.piece;
+        this._board = [...this._board];
+        if (csrc === Color.Black) {
+          this._hand_black[pt2hpt(ptsrc)] -= 1;
+          this._hand_black = { ...this._hand_black };
+        }
+        if (csrc === Color.White) {
+          this._hand_white[pt2hpt(ptsrc)] -= 1;
+          this._hand_white = { ...this._hand_white };
+        }
+      }
+      if (piece !== null) {
+        const [, ptdst] = p2cpt(piece);
+        if (csrc === Color.Black) {
+          this._hand_black[pt2hpt(ptdst)] += 1;
+          this._hand_black = { ...this._hand_black };
+        }
+        if (csrc === Color.White) {
+          this._hand_white[pt2hpt(ptdst)] += 1;
+          this._hand_white = { ...this._hand_white };
+        }
+      }
+      this._selected = null;
+    }
+  }
+  private _handPieceClickHandler(e: CustomEvent<{ piece: Piece }>) {
+    if (this._selected !== null) {
+      if (this._selected.sq !== null) {
+        return;
+      }
+      if (this._selected.piece === e.detail.piece) {
+        this._selected = null;
+        return;
+      }
+    }
+    this._selected = { sq: null, piece: e.detail.piece };
   }
 
   private clearBoard() {

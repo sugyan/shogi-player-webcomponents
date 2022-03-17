@@ -190,7 +190,7 @@ export function pt2hpt(pt: PieceType): HandPieceType {
       return PieceType.FU;
     case PieceType.KY:
     case PieceType.NY:
-      return PieceType.FU;
+      return PieceType.KY;
     case PieceType.KE:
     case PieceType.NK:
       return PieceType.KE;
