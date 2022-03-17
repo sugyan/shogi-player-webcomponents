@@ -13,8 +13,6 @@ import { pieceImage } from "./utils";
 export class ShogiHand extends LitElement {
   static override styles = css`
     :host {
-      display: flex;
-      width: 12.5%;
       font-size: small;
     }
     :host(.black) {
@@ -25,7 +23,7 @@ export class ShogiHand extends LitElement {
     }
     .hand-list {
       list-style: none;
-      margin: 15% 0;
+      margin: 0;
       padding-left: 0;
     }
     :host(.black) .hand-list {

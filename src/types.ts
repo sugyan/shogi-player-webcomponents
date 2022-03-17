@@ -31,9 +31,17 @@ export const Rank = {
 } as const;
 export type Rank = typeof Rank[keyof typeof Rank];
 
-export interface Square {
+export class Square {
   file: File;
   rank: Rank;
+
+  constructor(file: File, rank: Rank) {
+    this.file = file;
+    this.rank = rank;
+  }
+  equals(sq: Square): boolean {
+    return this.file === sq.file && this.rank === sq.rank;
+  }
 }
 
 export const PieceType = {

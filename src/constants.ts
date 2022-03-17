@@ -48,7 +48,7 @@ export const HAND_ZERO: Hand = {
 };
 
 export const HAND_ALL = {
-  [PieceType.FU]: 18,
+  [PieceType.FU]: 9,
   [PieceType.KY]: 2,
   [PieceType.KE]: 2,
   [PieceType.GI]: 2,

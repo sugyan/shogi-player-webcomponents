@@ -1,4 +1,12 @@
-import { File, Rank, Square, Piece } from "./types";
+import {
+  File,
+  Rank,
+  Square,
+  Color,
+  Piece,
+  PieceType,
+  HandPieceType,
+} from "./types";
 import { bfu } from "./resources/bfu";
 import { bky } from "./resources/bky";
 import { bke } from "./resources/bke";
@@ -107,14 +115,99 @@ function file2col(file: File): number {
 }
 
 export function rc2sq(row: number, col: number): Square {
-  return {
-    file: col2file(col),
-    rank: row2rank(row),
-  };
+  return new Square(col2file(col), row2rank(row));
 }
 
 export function sq2rc(sq: Square): [row: number, col: number] {
   return [rank2row(sq.rank), file2col(sq.file)];
+}
+
+export function p2cpt(p: Piece): [c: Color, pt: PieceType] {
+  switch (p) {
+    case Piece.BFU:
+      return [Color.Black, PieceType.FU];
+    case Piece.BKY:
+      return [Color.Black, PieceType.KY];
+    case Piece.BKE:
+      return [Color.Black, PieceType.KE];
+    case Piece.BGI:
+      return [Color.Black, PieceType.GI];
+    case Piece.BKI:
+      return [Color.Black, PieceType.KI];
+    case Piece.BKA:
+      return [Color.Black, PieceType.KA];
+    case Piece.BHI:
+      return [Color.Black, PieceType.HI];
+    case Piece.BOU:
+      return [Color.Black, PieceType.OU];
+    case Piece.BTO:
+      return [Color.Black, PieceType.TO];
+    case Piece.BNY:
+      return [Color.Black, PieceType.NY];
+    case Piece.BNK:
+      return [Color.Black, PieceType.NK];
+    case Piece.BNG:
+      return [Color.Black, PieceType.NG];
+    case Piece.BUM:
+      return [Color.Black, PieceType.UM];
+    case Piece.BRY:
+      return [Color.Black, PieceType.RY];
+    case Piece.WFU:
+      return [Color.White, PieceType.FU];
+    case Piece.WKY:
+      return [Color.White, PieceType.KY];
+    case Piece.WKE:
+      return [Color.White, PieceType.KE];
+    case Piece.WGI:
+      return [Color.White, PieceType.GI];
+    case Piece.WKI:
+      return [Color.White, PieceType.KI];
+    case Piece.WKA:
+      return [Color.White, PieceType.KA];
+    case Piece.WHI:
+      return [Color.White, PieceType.HI];
+    case Piece.WOU:
+      return [Color.White, PieceType.OU];
+    case Piece.WTO:
+      return [Color.White, PieceType.TO];
+    case Piece.WNY:
+      return [Color.White, PieceType.NY];
+    case Piece.WNK:
+      return [Color.White, PieceType.NK];
+    case Piece.WNG:
+      return [Color.White, PieceType.NG];
+    case Piece.WUM:
+      return [Color.White, PieceType.UM];
+    case Piece.WRY:
+      return [Color.White, PieceType.RY];
+  }
+}
+
+export function pt2hpt(pt: PieceType): HandPieceType {
+  switch (pt) {
+    case PieceType.FU:
+    case PieceType.TO:
+      return PieceType.FU;
+    case PieceType.KY:
+    case PieceType.NY:
+      return PieceType.FU;
+    case PieceType.KE:
+    case PieceType.NK:
+      return PieceType.KE;
+    case PieceType.GI:
+    case PieceType.NG:
+      return PieceType.GI;
+    case PieceType.KI:
+      return PieceType.KI;
+    case PieceType.KA:
+    case PieceType.UM:
+      return PieceType.KA;
+    case PieceType.HI:
+    case PieceType.RY:
+      return PieceType.HI;
+    case PieceType.OU:
+      return PieceType.OU;
+  }
 }
 
 export function nextPiece(piece: Piece): Piece {
