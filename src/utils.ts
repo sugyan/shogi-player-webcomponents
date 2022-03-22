@@ -1,12 +1,4 @@
-import {
-  File,
-  Rank,
-  Square,
-  Color,
-  Piece,
-  PieceType,
-  HandPieceType,
-} from "./types";
+import { Color, Piece, PieceType, HandPieceType } from "./types";
 import { bfu } from "./resources/bfu";
 import { bky } from "./resources/bky";
 import { bke } from "./resources/bke";
@@ -36,153 +28,6 @@ import { wng } from "./resources/wng";
 import { wum } from "./resources/wum";
 import { wry } from "./resources/wry";
 
-const FILES = [
-  File.File1,
-  File.File2,
-  File.File3,
-  File.File4,
-  File.File5,
-  File.File6,
-  File.File7,
-  File.File8,
-  File.File9,
-] as const;
-
-const RANKS = [
-  Rank.Rank1,
-  Rank.Rank2,
-  Rank.Rank3,
-  Rank.Rank4,
-  Rank.Rank5,
-  Rank.Rank6,
-  Rank.Rank7,
-  Rank.Rank8,
-  Rank.Rank9,
-] as const;
-
-function row2rank(row: number): Rank {
-  return RANKS[row];
-}
-
-function rank2row(rank: Rank): number {
-  switch (rank) {
-    case Rank.Rank1:
-      return 0;
-    case Rank.Rank2:
-      return 1;
-    case Rank.Rank3:
-      return 2;
-    case Rank.Rank4:
-      return 3;
-    case Rank.Rank5:
-      return 4;
-    case Rank.Rank6:
-      return 5;
-    case Rank.Rank7:
-      return 6;
-    case Rank.Rank8:
-      return 7;
-    case Rank.Rank9:
-      return 8;
-  }
-}
-
-function col2file(col: number): File {
-  return FILES[8 - col];
-}
-
-function file2col(file: File): number {
-  switch (file) {
-    case File.File1:
-      return 8;
-    case File.File2:
-      return 7;
-    case File.File3:
-      return 6;
-    case File.File4:
-      return 5;
-    case File.File5:
-      return 4;
-    case File.File6:
-      return 3;
-    case File.File7:
-      return 2;
-    case File.File8:
-      return 1;
-    case File.File9:
-      return 0;
-  }
-}
-
-export function rc2sq(row: number, col: number): Square {
-  return new Square(col2file(col), row2rank(row));
-}
-
-export function sq2rc(sq: Square): [row: number, col: number] {
-  return [rank2row(sq.rank), file2col(sq.file)];
-}
-
-export function p2cpt(p: Piece): [c: Color, pt: PieceType] {
-  switch (p) {
-    case Piece.BFU:
-      return [Color.Black, PieceType.FU];
-    case Piece.BKY:
-      return [Color.Black, PieceType.KY];
-    case Piece.BKE:
-      return [Color.Black, PieceType.KE];
-    case Piece.BGI:
-      return [Color.Black, PieceType.GI];
-    case Piece.BKI:
-      return [Color.Black, PieceType.KI];
-    case Piece.BKA:
-      return [Color.Black, PieceType.KA];
-    case Piece.BHI:
-      return [Color.Black, PieceType.HI];
-    case Piece.BOU:
-      return [Color.Black, PieceType.OU];
-    case Piece.BTO:
-      return [Color.Black, PieceType.TO];
-    case Piece.BNY:
-      return [Color.Black, PieceType.NY];
-    case Piece.BNK:
-      return [Color.Black, PieceType.NK];
-    case Piece.BNG:
-      return [Color.Black, PieceType.NG];
-    case Piece.BUM:
-      return [Color.Black, PieceType.UM];
-    case Piece.BRY:
-      return [Color.Black, PieceType.RY];
-    case Piece.WFU:
-      return [Color.White, PieceType.FU];
-    case Piece.WKY:
-      return [Color.White, PieceType.KY];
-    case Piece.WKE:
-      return [Color.White, PieceType.KE];
-    case Piece.WGI:
-      return [Color.White, PieceType.GI];
-    case Piece.WKI:
-      return [Color.White, PieceType.KI];
-    case Piece.WKA:
-      return [Color.White, PieceType.KA];
-    case Piece.WHI:
-      return [Color.White, PieceType.HI];
-    case Piece.WOU:
-      return [Color.White, PieceType.OU];
-    case Piece.WTO:
-      return [Color.White, PieceType.TO];
-    case Piece.WNY:
-      return [Color.White, PieceType.NY];
-    case Piece.WNK:
-      return [Color.White, PieceType.NK];
-    case Piece.WNG:
-      return [Color.White, PieceType.NG];
-    case Piece.WUM:
-      return [Color.White, PieceType.UM];
-    case Piece.WRY:
-      return [Color.White, PieceType.RY];
-  }
-}
-
 export function pt2hpt(pt: PieceType): HandPieceType {
   switch (pt) {
     case PieceType.FU:
@@ -211,124 +56,108 @@ export function pt2hpt(pt: PieceType): HandPieceType {
 }
 
 export function nextPiece(piece: Piece): Piece {
-  switch (piece) {
-    case Piece.BFU:
-      return Piece.BTO;
-    case Piece.BKY:
-      return Piece.BNY;
-    case Piece.BKE:
-      return Piece.BNK;
-    case Piece.BGI:
-      return Piece.BNG;
-    case Piece.BKI:
-      return Piece.WKI;
-    case Piece.BKA:
-      return Piece.BUM;
-    case Piece.BHI:
-      return Piece.BRY;
-    case Piece.BOU:
-      return Piece.WOU;
-    case Piece.BTO:
-      return Piece.WFU;
-    case Piece.BNY:
-      return Piece.WKY;
-    case Piece.BNK:
-      return Piece.WKE;
-    case Piece.BNG:
-      return Piece.WGI;
-    case Piece.BUM:
-      return Piece.WKA;
-    case Piece.BRY:
-      return Piece.WHI;
-    case Piece.WFU:
-      return Piece.WTO;
-    case Piece.WKY:
-      return Piece.WNY;
-    case Piece.WKE:
-      return Piece.WNK;
-    case Piece.WGI:
-      return Piece.WNG;
-    case Piece.WKI:
-      return Piece.BKI;
-    case Piece.WKA:
-      return Piece.WUM;
-    case Piece.WHI:
-      return Piece.WRY;
-    case Piece.WOU:
-      return Piece.BOU;
-    case Piece.WTO:
-      return Piece.BFU;
-    case Piece.WNY:
-      return Piece.BKY;
-    case Piece.WNK:
-      return Piece.BKE;
-    case Piece.WNG:
-      return Piece.BGI;
-    case Piece.WUM:
-      return Piece.BKA;
-    case Piece.WRY:
-      return Piece.BHI;
+  const col = piece.color;
+  const opp = {
+    [Color.Black]: Color.White,
+    [Color.White]: Color.Black,
+  }[col];
+  switch (piece.pieceType) {
+    case PieceType.FU:
+      return new Piece(col, PieceType.TO);
+    case PieceType.KY:
+      return new Piece(col, PieceType.NY);
+    case PieceType.KE:
+      return new Piece(col, PieceType.NK);
+    case PieceType.GI:
+      return new Piece(col, PieceType.NG);
+    case PieceType.KI:
+      return new Piece(opp, PieceType.KI);
+    case PieceType.KA:
+      return new Piece(col, PieceType.UM);
+    case PieceType.HI:
+      return new Piece(col, PieceType.RY);
+    case PieceType.OU:
+      return new Piece(opp, PieceType.OU);
+    case PieceType.TO:
+      return new Piece(opp, PieceType.FU);
+    case PieceType.NY:
+      return new Piece(opp, PieceType.KY);
+    case PieceType.NK:
+      return new Piece(opp, PieceType.KE);
+    case PieceType.NG:
+      return new Piece(opp, PieceType.GI);
+    case PieceType.UM:
+      return new Piece(opp, PieceType.KA);
+    case PieceType.RY:
+      return new Piece(opp, PieceType.HI);
   }
 }
 
-export function pieceImage(piece: Piece | null) {
-  switch (piece) {
-    case Piece.BFU:
-      return bfu;
-    case Piece.BKY:
-      return bky;
-    case Piece.BKE:
-      return bke;
-    case Piece.BGI:
-      return bgi;
-    case Piece.BKI:
-      return bki;
-    case Piece.BKA:
-      return bka;
-    case Piece.BHI:
-      return bhi;
-    case Piece.BOU:
-      return bou;
-    case Piece.BTO:
-      return bto;
-    case Piece.BNY:
-      return bny;
-    case Piece.BNK:
-      return bnk;
-    case Piece.BNG:
-      return bng;
-    case Piece.BUM:
-      return bum;
-    case Piece.BRY:
-      return bry;
-    case Piece.WFU:
-      return wfu;
-    case Piece.WKY:
-      return wky;
-    case Piece.WKE:
-      return wke;
-    case Piece.WGI:
-      return wgi;
-    case Piece.WKI:
-      return wki;
-    case Piece.WKA:
-      return wka;
-    case Piece.WHI:
-      return whi;
-    case Piece.WOU:
-      return wou;
-    case Piece.WTO:
-      return wto;
-    case Piece.WNY:
-      return wny;
-    case Piece.WNK:
-      return wnk;
-    case Piece.WNG:
-      return wng;
-    case Piece.WUM:
-      return wum;
-    case Piece.WRY:
-      return wry;
+export function pieceImage(piece: Piece) {
+  switch (piece.color) {
+    case Color.Black:
+      switch (piece.pieceType) {
+        case PieceType.FU:
+          return bfu;
+        case PieceType.KY:
+          return bky;
+        case PieceType.KE:
+          return bke;
+        case PieceType.GI:
+          return bgi;
+        case PieceType.KI:
+          return bki;
+        case PieceType.KA:
+          return bka;
+        case PieceType.HI:
+          return bhi;
+        case PieceType.OU:
+          return bou;
+        case PieceType.TO:
+          return bto;
+        case PieceType.NY:
+          return bny;
+        case PieceType.NK:
+          return bnk;
+        case PieceType.NG:
+          return bng;
+        case PieceType.UM:
+          return bum;
+        case PieceType.RY:
+          return bry;
+      }
+      break;
+    case Color.White:
+      switch (piece.pieceType) {
+        case PieceType.FU:
+          return wfu;
+        case PieceType.KY:
+          return wky;
+        case PieceType.KE:
+          return wke;
+        case PieceType.GI:
+          return wgi;
+        case PieceType.KI:
+          return wki;
+        case PieceType.KA:
+          return wka;
+        case PieceType.HI:
+          return whi;
+        case PieceType.OU:
+          return wou;
+        case PieceType.TO:
+          return wto;
+        case PieceType.NY:
+          return wny;
+        case PieceType.NK:
+          return wnk;
+        case PieceType.NG:
+          return wng;
+        case PieceType.UM:
+          return wum;
+        case PieceType.RY:
+          return wry;
+      }
+      break;
   }
-  return null;
 }

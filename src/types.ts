@@ -1,7 +1,6 @@
 export const Color = {
   Black: "black",
   White: "white",
-  None: "",
 } as const;
 export type Color = typeof Color[keyof typeof Color];
 
@@ -32,15 +31,80 @@ export const Rank = {
 export type Rank = typeof Rank[keyof typeof Rank];
 
 export class Square {
-  file: File;
-  rank: Rank;
-
-  constructor(file: File, rank: Rank) {
-    this.file = file;
-    this.rank = rank;
+  static FILES = [
+    File.File9,
+    File.File8,
+    File.File7,
+    File.File6,
+    File.File5,
+    File.File4,
+    File.File3,
+    File.File2,
+    File.File1,
+  ] as const;
+  static RANKS = [
+    Rank.Rank1,
+    Rank.Rank2,
+    Rank.Rank3,
+    Rank.Rank4,
+    Rank.Rank5,
+    Rank.Rank6,
+    Rank.Rank7,
+    Rank.Rank8,
+    Rank.Rank9,
+  ] as const;
+  readonly file: File;
+  readonly rank: Rank;
+  constructor(row: number, col: number) {
+    this.file = Square.FILES[col];
+    this.rank = Square.RANKS[row];
   }
   equals(sq: Square): boolean {
     return this.file === sq.file && this.rank === sq.rank;
+  }
+  get row() {
+    switch (this.rank) {
+      case Rank.Rank1:
+        return 0;
+      case Rank.Rank2:
+        return 1;
+      case Rank.Rank3:
+        return 2;
+      case Rank.Rank4:
+        return 3;
+      case Rank.Rank5:
+        return 4;
+      case Rank.Rank6:
+        return 5;
+      case Rank.Rank7:
+        return 6;
+      case Rank.Rank8:
+        return 7;
+      case Rank.Rank9:
+        return 8;
+    }
+  }
+  get col() {
+    switch (this.file) {
+      case File.File1:
+        return 8;
+      case File.File2:
+        return 7;
+      case File.File3:
+        return 6;
+      case File.File4:
+        return 5;
+      case File.File5:
+        return 4;
+      case File.File6:
+        return 3;
+      case File.File7:
+        return 2;
+      case File.File8:
+        return 1;
+      case File.File9:
+        return 0;
+    }
   }
 }
 
@@ -66,62 +130,20 @@ export type HandPieceType = Extract<
   "FU" | "KY" | "KE" | "GI" | "KI" | "KA" | "HI" | "OU"
 >;
 
-export const Piece = {
-  BFU: "BFU",
-  BKY: "BKY",
-  BKE: "BKE",
-  BGI: "BGI",
-  BKI: "BKI",
-  BKA: "BKA",
-  BHI: "BHI",
-  BOU: "BOU",
-  BTO: "BTO",
-  BNY: "BNY",
-  BNK: "BNK",
-  BNG: "BNG",
-  BUM: "BUM",
-  BRY: "BRY",
-  WFU: "WFU",
-  WKY: "WKY",
-  WKE: "WKE",
-  WGI: "WGI",
-  WKI: "WKI",
-  WKA: "WKA",
-  WHI: "WHI",
-  WOU: "WOU",
-  WTO: "WTO",
-  WNY: "WNY",
-  WNK: "WNK",
-  WNG: "WNG",
-  WUM: "WUM",
-  WRY: "WRY",
-} as const;
-export type Piece = typeof Piece[keyof typeof Piece];
+export class Piece {
+  readonly color: Color;
+  readonly pieceType: PieceType;
 
-export type BoardCol = Piece | null;
+  constructor(color: Color, pieceType: PieceType) {
+    this.color = color;
+    this.pieceType = pieceType;
+  }
+  equals(p: Piece): boolean {
+    return this.color === p.color && this.pieceType === p.pieceType;
+  }
+}
 
-export type BoardRow = [
-  BoardCol,
-  BoardCol,
-  BoardCol,
-  BoardCol,
-  BoardCol,
-  BoardCol,
-  BoardCol,
-  BoardCol,
-  BoardCol
-];
-
-export type Board = [
-  BoardRow,
-  BoardRow,
-  BoardRow,
-  BoardRow,
-  BoardRow,
-  BoardRow,
-  BoardRow,
-  BoardRow,
-  BoardRow
-];
+export type BoardPiece = Piece | null;
+export type Board = BoardPiece[][];
 
 export type Hand = { [key in HandPieceType]: number };

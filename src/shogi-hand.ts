@@ -1,11 +1,11 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { styleMap } from "lit/directives/style-map.js";
+import { classMap } from "lit/directives/class-map.js";
 import { choose } from "lit/directives/choose.js";
 import { when } from "lit/directives/when.js";
-import { Color, PieceType, Piece, HandPieceType, Hand } from "./types";
+import { Color, Hand, HandPieceType, Piece, PieceType } from "./types";
 import { pieceImage } from "./utils";
-import { HAND_KEYS, HAND_ZERO } from "./constants";
+import { HAND_KEYS } from "./constants";
 
 /**
  * This is Shogi hand pieces element.
@@ -39,27 +39,40 @@ export class ShogiHand extends LitElement {
       white-space: nowrap;
       cursor: pointer;
     }
+    .hand-piece.selected {
+      background-color: gold;
+    }
     .hand-piece svg {
       height: 100%;
       width: 100%;
     }
   `;
-  @property({ type: String }) color: Color = Color.None;
-  @property({ type: Object }) hand: Hand = HAND_ZERO;
-  @property({ type: String }) selected: Piece | null = null;
+
+  @property({ type: String }) color: Color = Color.Black;
+  @property({ type: Object }) hand: Hand = {
+    [PieceType.FU]: 0,
+    [PieceType.KY]: 0,
+    [PieceType.KE]: 0,
+    [PieceType.GI]: 0,
+    [PieceType.KI]: 0,
+    [PieceType.KA]: 0,
+    [PieceType.HI]: 0,
+    [PieceType.OU]: 0,
+  };
+  @property({ type: Object }) select: Piece | null = null;
 
   override render() {
     const hands = HAND_KEYS.map((pt: HandPieceType) => {
       const num = this.hand[pt];
       return html`${when(num > 0, () => {
-        const p = this.piece(pt);
-        const styles = {
-          backgroundColor: p === this.selected ? "gold" : "",
+        const p = new Piece(this.color, pt);
+        const classes = {
+          "hand-piece": true,
+          selected: this.select !== null && p.equals(this.select),
         };
         return html`<li
-          class="hand-piece"
-          style=${styleMap(styles)}
-          @click=${() => this._clickHandler(pt)}
+          class=${classMap(classes)}
+          @click=${(e: MouseEvent) => this._clickHandler(e, pt)}
         >
           ${pieceImage(p)} ${when(num > 1, () => num)}
         </li>`;
@@ -73,54 +86,9 @@ export class ShogiHand extends LitElement {
     </ul> `;
   }
 
-  private _clickHandler(pt: HandPieceType) {
-    const piece = this.piece(pt);
+  private _clickHandler(e: MouseEvent, pt: HandPieceType) {
+    e.stopPropagation();
+    const piece = new Piece(this.color, pt);
     this.dispatchEvent(new CustomEvent("hand-clicked", { detail: { piece } }));
-  }
-  private piece(pt: HandPieceType): Piece {
-    switch (this.color) {
-      case Color.Black:
-        switch (pt) {
-          case PieceType.FU:
-            return Piece.BFU;
-          case PieceType.KY:
-            return Piece.BKY;
-          case PieceType.KE:
-            return Piece.BKE;
-          case PieceType.GI:
-            return Piece.BGI;
-          case PieceType.KI:
-            return Piece.BKI;
-          case PieceType.KA:
-            return Piece.BKA;
-          case PieceType.HI:
-            return Piece.BHI;
-          case PieceType.OU:
-            return Piece.BOU;
-        }
-        break;
-      case Color.White:
-        switch (pt) {
-          case PieceType.FU:
-            return Piece.WFU;
-          case PieceType.KY:
-            return Piece.WKY;
-          case PieceType.KE:
-            return Piece.WKE;
-          case PieceType.GI:
-            return Piece.WGI;
-          case PieceType.KI:
-            return Piece.WKI;
-          case PieceType.KA:
-            return Piece.WKA;
-          case PieceType.HI:
-            return Piece.WHI;
-          case PieceType.OU:
-            return Piece.WOU;
-        }
-        break;
-      default:
-        throw new Error("invalid piece type");
-    }
   }
 }

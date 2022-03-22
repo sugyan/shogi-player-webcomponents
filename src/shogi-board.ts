@@ -1,9 +1,9 @@
-import { LitElement, html, css } from "lit";
+import { LitElement, html, css, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import { ClassInfo, classMap } from "lit/directives/class-map.js";
 import { styleMap } from "lit/directives/style-map.js";
-import { BOARD_NULL } from "./constants";
-import { Board, BoardCol, BoardRow, Square } from "./types";
-import { rc2sq, sq2rc, nextPiece, pieceImage } from "./utils";
+import { Board, Square } from "./types";
+import { pieceImage } from "./utils";
 
 /**
  * This is Shogi Board element.
@@ -27,6 +27,9 @@ export class ShogiBoard extends LitElement {
       width: 11%;
       position: relative;
     }
+    table tr td.selected {
+      background-color: gold;
+    }
     table tr td::after {
       content: "";
       display: block;
@@ -45,27 +48,36 @@ export class ShogiBoard extends LitElement {
     }
   `;
 
-  @property({ type: Array }) board: Board = BOARD_NULL;
-  @property({ type: Object }) selected: Square | null = null;
+  @property({
+    type: Array,
+  })
+  board: Board = Array(9).fill(Array(9).fill(null));
+  @property({ type: Object }) select: Square | null = null;
 
   override render() {
     return html`<table>
-      ${this.board.map((row: BoardRow, i: number) => {
+      ${this.board.map((row, i) => {
         return html`<tr>
-          ${row.map((col: BoardCol, j: number) => {
-            const sq = rc2sq(i, j);
+          ${row.map((col, j) => {
+            const sq = new Square(i, j);
+            const classes: ClassInfo = {
+              selected:
+                this.select !== null && this.select.equals(sq) ? true : false,
+            };
             const styles = {
               cursor:
-                this.selected !== null || col !== null ? "pointer" : "default",
-              backgroundColor: this.isSelected(sq) ? "gold" : "",
+                this.select !== null || col !== null ? "pointer" : "inherit",
             };
-            return html`<td style=${styleMap(styles)}>
+            return html`<td
+              class=${classMap(classes)}
+              style=${styleMap(styles)}
+            >
               <div
                 class="shogi-cell"
                 @click=${() => this._clickHandler(sq)}
                 @dblclick=${() => this._dblclickHandler(sq)}
               >
-                ${pieceImage(col)}
+                ${col !== null ? pieceImage(col) : nothing}
               </div>
             </td>`;
           })}
@@ -75,17 +87,12 @@ export class ShogiBoard extends LitElement {
   }
 
   private _clickHandler(sq: Square) {
-    this.dispatchEvent(new CustomEvent("cell-clicked", { detail: { sq } }));
+    this.dispatchEvent(new CustomEvent("cell-click", { detail: { sq } }));
   }
   private _dblclickHandler(sq: Square) {
-    const [row, col] = sq2rc(sq);
-    const piece = this.board[row][col];
+    const piece = this.board[sq.row][sq.col];
     if (piece !== null) {
-      this.board[row][col] = nextPiece(piece);
-      this.requestUpdate("board");
+      this.dispatchEvent(new CustomEvent("cell-dblclick", { detail: { sq } }));
     }
-  }
-  private isSelected(sq: Square): boolean {
-    return this.selected !== null && this.selected.equals(sq);
   }
 }
