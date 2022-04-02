@@ -31,7 +31,7 @@ const SFEN_PIECE_MAP: { [key: string]: Piece } = {
   "+r": new Piece(Color.White, PieceType.RY),
 } as const;
 
-export async function parseSfen(sfen: string): Promise<[Board, Hand, Hand]> {
+export function parseSfen(sfen: string): [Board, Hand, Hand] {
   const board = Array.from(Array(9), () => Array(9).fill(null));
   const hands = [
     {

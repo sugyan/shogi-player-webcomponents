@@ -8,7 +8,7 @@ import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { styleMap } from "lit/directives/style-map.js";
 import { ShogiBoard } from "./shogi-board";
-import { Board, Color, Hand, Piece, PieceType, Square } from "./types";
+import { Board, Color, Hand, Piece, Square } from "./types";
 import { nextPiece, pt2hpt } from "./utils";
 import { parseSfen } from "./sfen";
 import "./shogi-board";
@@ -49,21 +49,19 @@ export class ShogiPlayer extends LitElement {
 
   constructor() {
     super();
-    console.log("constructor", this.sfen);
+    this.sfen =
+      "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1";
+    [this._board, this._hand_black, this._hand_white] = parseSfen(this.sfen);
   }
 
-  override async attributeChangedCallback(
+  override attributeChangedCallback(
     name: string,
     old: string | null,
     value: string | null
-  ): Promise<void> {
-    console.log(name, value);
-
+  ): void {
     if (name === "sfen" && value !== old && value !== null) {
       try {
-        [this._board, this._hand_black, this._hand_white] = await parseSfen(
-          value
-        );
+        [this._board, this._hand_black, this._hand_white] = parseSfen(value);
       } catch (e) {
         console.error(e);
       }
@@ -79,32 +77,14 @@ export class ShogiPlayer extends LitElement {
    * The SFEN representation of initial position
    */
   @property({ type: String, attribute: true })
-  sfen = "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1";
+  sfen;
 
   @state()
-  private _board: Board = Array.from(Array(9), () => Array(9).fill(null));
+  private _board: Board;
   @state()
-  private _hand_black: Hand = {
-    [PieceType.FU]: 0,
-    [PieceType.KY]: 0,
-    [PieceType.KE]: 0,
-    [PieceType.GI]: 0,
-    [PieceType.KI]: 0,
-    [PieceType.KA]: 0,
-    [PieceType.HI]: 0,
-    [PieceType.OU]: 0,
-  };
+  private _hand_black: Hand;
   @state()
-  private _hand_white: Hand = {
-    [PieceType.FU]: 0,
-    [PieceType.KY]: 0,
-    [PieceType.KE]: 0,
-    [PieceType.GI]: 0,
-    [PieceType.KI]: 0,
-    [PieceType.KA]: 0,
-    [PieceType.HI]: 0,
-    [PieceType.OU]: 0,
-  };
+  private _hand_white: Hand;
   @state()
   private _select: Select | null = null;
 
