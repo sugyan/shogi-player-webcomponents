@@ -56,26 +56,26 @@ export function pt2hpt(pt: PieceType): HandPieceType {
 }
 
 export function nextPiece(piece: Piece): Piece {
-  const col = piece.color;
+  const c = piece.color;
   const opp = {
     [Color.Black]: Color.White,
     [Color.White]: Color.Black,
-  }[col];
+  }[c];
   switch (piece.pieceType) {
     case PieceType.FU:
-      return new Piece(col, PieceType.TO);
+      return new Piece(c, PieceType.TO);
     case PieceType.KY:
-      return new Piece(col, PieceType.NY);
+      return new Piece(c, PieceType.NY);
     case PieceType.KE:
-      return new Piece(col, PieceType.NK);
+      return new Piece(c, PieceType.NK);
     case PieceType.GI:
-      return new Piece(col, PieceType.NG);
+      return new Piece(c, PieceType.NG);
     case PieceType.KI:
       return new Piece(opp, PieceType.KI);
     case PieceType.KA:
-      return new Piece(col, PieceType.UM);
+      return new Piece(c, PieceType.UM);
     case PieceType.HI:
-      return new Piece(col, PieceType.RY);
+      return new Piece(c, PieceType.RY);
     case PieceType.OU:
       return new Piece(opp, PieceType.OU);
     case PieceType.TO:
