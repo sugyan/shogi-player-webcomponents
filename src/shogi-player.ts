@@ -153,8 +153,9 @@ export class ShogiPlayer extends LitElement {
     }
   }
   private _cellDblclickHandler(e: CustomEvent<{ sq: Square }>) {
-    this.movePiece(e.detail.sq, e.detail.sq);
-    this._select = null;
+    if (this._select === null) {
+      this.movePiece(e.detail.sq, e.detail.sq);
+    }
   }
   private _handPieceClickHandler(e: CustomEvent<{ piece: Piece }>) {
     if (this._select !== null) {
@@ -173,81 +174,100 @@ export class ShogiPlayer extends LitElement {
     _promotion?: boolean
   ) {
     if (this._select === null) {
-      // doubl click only
-      if (dst instanceof Square && src !== null && src.equals(dst)) {
-        const board = this._board.map((row) => row.slice());
-        const piece = board[src.row][src.col];
-        if (piece !== null) {
-          board[src.row][src.col] = nextPiece(piece);
-        }
-        this._board = board;
+      if (!(dst instanceof Square && src !== null && src.equals(dst))) {
+        return;
       }
-      return;
-    }
-    if (dst instanceof Square) {
+      // double click
       const board = this._board.map((row) => row.slice());
-      const psrc = this._select.piece;
-      const pdst = board[dst.row][dst.col];
-      // move the piece on the board
-      if (src !== null) {
-        board[src.row][src.col] = null;
-        board[dst.row][dst.col] = psrc;
-        // captured?
-        if (pdst) {
+      const piece = board[src.row][src.col];
+      if (piece !== null) {
+        board[src.row][src.col] = nextPiece(piece);
+      }
+      this._board = board;
+    } else {
+      if (dst instanceof Square) {
+        const board = this._board.map((row) => row.slice());
+        const psrc = this._select.piece;
+        const pdst = board[dst.row][dst.col];
+        // move the piece on the board
+        if (src !== null) {
+          board[src.row][src.col] = null;
+          board[dst.row][dst.col] = psrc;
+          // captured?
+          if (pdst) {
+            if (psrc.color === Color.Black) {
+              const hand = { ...this._hand_black };
+              hand[pt2hpt(pdst.pieceType)] += 1;
+              this._hand_black = hand;
+            }
+            if (psrc.color === Color.White) {
+              const hand = { ...this._hand_white };
+              hand[pt2hpt(pdst.pieceType)] += 1;
+              this._hand_white = hand;
+            }
+          }
+        }
+        // drop the piece to the board
+        else {
+          board[dst.row][dst.col] = psrc;
           if (psrc.color === Color.Black) {
             const hand = { ...this._hand_black };
-            hand[pt2hpt(pdst.pieceType)] += 1;
+            hand[pt2hpt(psrc.pieceType)] -= 1;
+            if (pdst !== null) {
+              hand[pt2hpt(pdst.pieceType)] += 1;
+            }
             this._hand_black = hand;
           }
           if (psrc.color === Color.White) {
             const hand = { ...this._hand_white };
-            hand[pt2hpt(pdst.pieceType)] += 1;
+            hand[pt2hpt(psrc.pieceType)] -= 1;
+            if (pdst !== null) {
+              hand[pt2hpt(pdst.pieceType)] += 1;
+            }
             this._hand_white = hand;
           }
         }
-      }
-      // drop the piece to the board
-      else {
-        board[dst.row][dst.col] = psrc;
-        if (psrc.color === Color.Black) {
-          const hand = { ...this._hand_black };
-          hand[pt2hpt(psrc.pieceType)] -= 1;
-          if (pdst !== null) {
-            hand[pt2hpt(pdst.pieceType)] += 1;
-          }
-          this._hand_black = hand;
-        }
-        if (psrc.color === Color.White) {
-          const hand = { ...this._hand_white };
-          hand[pt2hpt(psrc.pieceType)] -= 1;
-          if (pdst !== null) {
-            hand[pt2hpt(pdst.pieceType)] += 1;
-          }
-          this._hand_white = hand;
-        }
-      }
-      this._board = board;
-    } else {
-      // remove the piece from the board
-      if (src !== null) {
-        const board = this._board.map((row) => row.slice());
-        const piece = this._select.piece;
-        board[src.row][src.col] = null;
-        if (dst === Color.Black) {
-          const hand = { ...this._hand_black };
-          hand[pt2hpt(piece.pieceType)] += 1;
-          this._hand_black = hand;
-        }
-        if (dst === Color.White) {
-          const hand = { ...this._hand_white };
-          hand[pt2hpt(piece.pieceType)] += 1;
-          this._hand_white = hand;
-        }
         this._board = board;
-      }
-      // move the hand pieces
-      else {
-        // TODO
+      } else {
+        const piece = this._select.piece;
+        const hpt = pt2hpt(piece.pieceType);
+        switch (dst) {
+          case Color.Black:
+            this._hand_black = {
+              ...this._hand_black,
+              [hpt]: this._hand_black[hpt] + 1,
+            };
+            break;
+          case Color.White:
+            this._hand_white = {
+              ...this._hand_white,
+              [hpt]: this._hand_white[hpt] + 1,
+            };
+            break;
+        }
+        // remove the piece from the board
+        if (src !== null) {
+          const board = this._board.map((row) => row.slice());
+          board[src.row][src.col] = null;
+          this._board = board;
+        }
+        // move the hand pieces
+        else if (piece.color !== dst) {
+          switch (dst) {
+            case Color.Black:
+              this._hand_white = {
+                ...this._hand_white,
+                [hpt]: this._hand_white[hpt] - 1,
+              };
+              break;
+            case Color.White:
+              this._hand_black = {
+                ...this._hand_black,
+                [hpt]: this._hand_black[hpt] - 1,
+              };
+              break;
+          }
+        }
       }
     }
   }
