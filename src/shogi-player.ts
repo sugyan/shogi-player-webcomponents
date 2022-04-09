@@ -10,9 +10,13 @@ import { styleMap } from "lit/directives/style-map.js";
 import { ShogiBoard } from "./shogi-board";
 import { Board, Color, Hand, Piece, Square } from "./types";
 import { nextPiece, pt2hpt } from "./utils";
-import { parseSfen } from "./sfen";
+import { parseSfen, toSfen } from "./sfen";
 import "./shogi-board";
 import "./shogi-hand";
+
+interface UpdateEventDetail {
+  sfen: string;
+}
 
 class Select {
   readonly sq: Square | null;
@@ -270,6 +274,13 @@ export class ShogiPlayer extends LitElement {
         }
       }
     }
+    this.dispatchEvent(
+      new CustomEvent<UpdateEventDetail>("update", {
+        detail: {
+          sfen: toSfen(this._board, this._hand_black, this._hand_white),
+        },
+      })
+    );
   }
 }
 

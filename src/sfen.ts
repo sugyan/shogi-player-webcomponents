@@ -1,8 +1,17 @@
-import { Board, Color, Hand, Piece, PieceType } from "./types";
+import {
+  Board,
+  BoardPiece,
+  Color,
+  Hand,
+  HandPieceType,
+  Piece,
+  PieceType,
+} from "./types";
 // prettier-ignore
 import {
   BFU, BKY, BKE, BGI, BKI, BKA, BHI, BOU, BTO, BNY, BNK, BNG, BUM, BRY,
   WFU, WKY, WKE, WGI, WKI, WKA, WHI, WOU, WTO, WNY, WNK, WNG, WUM, WRY,
+  HAND_KEYS,
 } from "./constants";
 
 const SFEN_PIECE_MAP: { [key: string]: Piece } = {
@@ -35,6 +44,49 @@ const SFEN_PIECE_MAP: { [key: string]: Piece } = {
   "+b": WUM,
   "+r": WRY,
 } as const;
+
+function pt2sfen(pt: PieceType): string {
+  switch (pt) {
+    case PieceType.FU:
+      return "p";
+    case PieceType.KY:
+      return "l";
+    case PieceType.KE:
+      return "n";
+    case PieceType.GI:
+      return "s";
+    case PieceType.KI:
+      return "g";
+    case PieceType.KA:
+      return "b";
+    case PieceType.HI:
+      return "r";
+    case PieceType.OU:
+      return "k";
+    case PieceType.TO:
+      return "+p";
+    case PieceType.NY:
+      return "+l";
+    case PieceType.NK:
+      return "+n";
+    case PieceType.NG:
+      return "+s";
+    case PieceType.UM:
+      return "+b";
+    case PieceType.RY:
+      return "+r";
+  }
+}
+
+function p2sfen(p: Piece): string {
+  const s = pt2sfen(p.pieceType);
+  switch (p.color) {
+    case Color.Black:
+      return s.toUpperCase();
+    case Color.White:
+      return s;
+  }
+}
 
 export function parseSfen(sfen: string): [Board, Hand, Hand] {
   const board = Array.from(Array(9), () => Array(9).fill(null));
@@ -112,4 +164,55 @@ export function parseSfen(sfen: string): [Board, Hand, Hand] {
     }
   }
   return [board, hand_black, hand_white];
+}
+
+export function toSfen(
+  board: Board,
+  hand_black: Hand,
+  hand_white: Hand
+): string {
+  const parts = ["", "b", "-", "1"];
+  parts[0] = board
+    .map((row: BoardPiece[]) => {
+      let s = "";
+      let emp = 0;
+      for (let i = 0; i < 9; i++) {
+        const p = row[i];
+        if (p !== null) {
+          if (emp > 0) {
+            s += String(emp);
+            emp = 0;
+          }
+          s += p2sfen(p);
+        } else {
+          emp++;
+        }
+      }
+      if (emp > 0) {
+        s += String(emp);
+      }
+      return s;
+    })
+    .join("/");
+  // TODO: side to move
+  if (
+    Object.values(hand_black).some((v) => v > 0) ||
+    Object.values(hand_white).some((v) => v > 0)
+  ) {
+    parts[2] = "";
+    [hand_black, hand_white].forEach((hand: Hand, index: number) => {
+      Array.from(HAND_KEYS)
+        .reverse()
+        .forEach((hpt: HandPieceType) => {
+          const num = hand[hpt];
+          if (num > 1) {
+            parts[2] += String(num);
+          }
+          if (num > 0) {
+            parts[2] += index === 0 ? pt2sfen(hpt).toUpperCase() : pt2sfen(hpt);
+          }
+        });
+    });
+  }
+  return parts.join(" ");
 }
