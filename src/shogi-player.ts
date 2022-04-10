@@ -55,7 +55,8 @@ export class ShogiPlayer extends LitElement {
     super();
     this.sfen =
       "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1";
-    [this._board, this._hand_black, this._hand_white] = parseSfen(this.sfen);
+    [this._board, this._handBlack, this._handWhite, this._sideToMove] =
+      parseSfen(this.sfen);
   }
 
   override attributeChangedCallback(
@@ -65,7 +66,7 @@ export class ShogiPlayer extends LitElement {
   ): void {
     if (name === "sfen" && value !== old && value !== null) {
       try {
-        [this._board, this._hand_black, this._hand_white] = parseSfen(value);
+        [this._board, this._handBlack, this._handWhite] = parseSfen(value);
       } catch (e) {
         console.error(e);
       }
@@ -86,9 +87,11 @@ export class ShogiPlayer extends LitElement {
   @state()
   private _board: Board;
   @state()
-  private _hand_black: Hand;
+  private _handBlack: Hand;
   @state()
-  private _hand_white: Hand;
+  private _handWhite: Hand;
+  @state()
+  private _sideToMove: Color;
   @state()
   private _select: Select | null = null;
 
@@ -106,7 +109,7 @@ export class ShogiPlayer extends LitElement {
           <shogi-hand
             class="white"
             color=${Color.White}
-            .hand=${this._hand_white}
+            .hand=${this._handWhite}
             .select=${this._select !== null && this._select.sq === null
               ? this._select.piece
               : null}
@@ -126,7 +129,7 @@ export class ShogiPlayer extends LitElement {
           <shogi-hand
             class="black"
             color=${Color.Black}
-            .hand=${this._hand_black}
+            .hand=${this._handBlack}
             .select=${this._select !== null && this._select.sq === null
               ? this._select.piece
               : null}
@@ -200,14 +203,14 @@ export class ShogiPlayer extends LitElement {
           // captured?
           if (pdst) {
             if (psrc.color === Color.Black) {
-              const hand = { ...this._hand_black };
+              const hand = { ...this._handBlack };
               hand[pt2hpt(pdst.pieceType)] += 1;
-              this._hand_black = hand;
+              this._handBlack = hand;
             }
             if (psrc.color === Color.White) {
-              const hand = { ...this._hand_white };
+              const hand = { ...this._handWhite };
               hand[pt2hpt(pdst.pieceType)] += 1;
-              this._hand_white = hand;
+              this._handWhite = hand;
             }
           }
         }
@@ -215,40 +218,26 @@ export class ShogiPlayer extends LitElement {
         else {
           board[dst.row][dst.col] = psrc;
           if (psrc.color === Color.Black) {
-            const hand = { ...this._hand_black };
+            const hand = { ...this._handBlack };
             hand[pt2hpt(psrc.pieceType)] -= 1;
             if (pdst !== null) {
               hand[pt2hpt(pdst.pieceType)] += 1;
             }
-            this._hand_black = hand;
+            this._handBlack = hand;
           }
           if (psrc.color === Color.White) {
-            const hand = { ...this._hand_white };
+            const hand = { ...this._handWhite };
             hand[pt2hpt(psrc.pieceType)] -= 1;
             if (pdst !== null) {
               hand[pt2hpt(pdst.pieceType)] += 1;
             }
-            this._hand_white = hand;
+            this._handWhite = hand;
           }
         }
         this._board = board;
       } else {
         const piece = this._select.piece;
         const hpt = pt2hpt(piece.pieceType);
-        switch (dst) {
-          case Color.Black:
-            this._hand_black = {
-              ...this._hand_black,
-              [hpt]: this._hand_black[hpt] + 1,
-            };
-            break;
-          case Color.White:
-            this._hand_white = {
-              ...this._hand_white,
-              [hpt]: this._hand_white[hpt] + 1,
-            };
-            break;
-        }
         // remove the piece from the board
         if (src !== null) {
           const board = this._board.map((row) => row.slice());
@@ -259,25 +248,46 @@ export class ShogiPlayer extends LitElement {
         else if (piece.color !== dst) {
           switch (dst) {
             case Color.Black:
-              this._hand_white = {
-                ...this._hand_white,
-                [hpt]: this._hand_white[hpt] - 1,
+              this._handWhite = {
+                ...this._handWhite,
+                [hpt]: this._handWhite[hpt] - 1,
               };
               break;
             case Color.White:
-              this._hand_black = {
-                ...this._hand_black,
-                [hpt]: this._hand_black[hpt] - 1,
+              this._handBlack = {
+                ...this._handBlack,
+                [hpt]: this._handBlack[hpt] - 1,
               };
               break;
           }
+        } else {
+          return;
+        }
+        switch (dst) {
+          case Color.Black:
+            this._handBlack = {
+              ...this._handBlack,
+              [hpt]: this._handBlack[hpt] + 1,
+            };
+            break;
+          case Color.White:
+            this._handWhite = {
+              ...this._handWhite,
+              [hpt]: this._handWhite[hpt] + 1,
+            };
+            break;
         }
       }
     }
     this.dispatchEvent(
       new CustomEvent<UpdateEventDetail>("update", {
         detail: {
-          sfen: toSfen(this._board, this._hand_black, this._hand_white),
+          sfen: toSfen(
+            this._board,
+            this._handBlack,
+            this._handWhite,
+            this._sideToMove
+          ),
         },
       })
     );
