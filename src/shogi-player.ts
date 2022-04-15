@@ -34,9 +34,8 @@ class Select {
 export class ShogiPlayer extends LitElement {
   static override styles = css`
     :host {
-      width: 600px;
+      min-width: 500px;
       display: block;
-      border: solid 1px gray;
       padding: 16px;
       font-family: sans-serif;
     }
