@@ -27,6 +27,13 @@ export class ShogiHand extends LitElement {
       transform: rotate(0.5turn);
       padding-left: 0.8em;
     }
+    :host([active]) .side-to-move {
+      color: black;
+      text-shadow: 0 0 0.1em;
+    }
+    :not(:host([active]) .side-to-move) {
+      color: gray;
+    }
     .side-to-move {
       text-align: center;
       font-size: x-large;
@@ -58,6 +65,7 @@ export class ShogiHand extends LitElement {
     }
   `;
 
+  @property({ type: Boolean, reflect: true }) active = false;
   @property({ type: String }) color: Color = Color.Black;
   @property({ type: Object }) hand: Hand = {
     [PieceType.FU]: 0,
@@ -82,7 +90,7 @@ export class ShogiHand extends LitElement {
         };
         return html`<li
           class=${classMap(classes)}
-          @click=${(e: MouseEvent) => this._clickHandler(e, pt)}
+          @click=${(e: MouseEvent) => this.clickPieceHandler(e, pt)}
         >
           ${pieceImage(p)} ${when(num > 1, () => num)}
         </li>`;
@@ -91,7 +99,15 @@ export class ShogiHand extends LitElement {
     return html`
       ${when(
         this.color === Color.Black,
-        () => html`<div class="side-to-move">&#x2617;</div>`
+        () =>
+          html`<div
+            class="side-to-move"
+            @click=${(e: MouseEvent) => {
+              this.clickSideToMoveHandler(e, Color.Black);
+            }}
+          >
+            &#x2617;
+          </div>`
       )}
       <ul class="hand-list black">
         ${choose(this.color, [
@@ -101,14 +117,29 @@ export class ShogiHand extends LitElement {
       </ul>
       ${when(
         this.color === Color.White,
-        () => html`<div class="side-to-move">&#x2616;</div>`
+        () => html`<div
+          class="side-to-move"
+          @click=${(e: MouseEvent) => {
+            this.clickSideToMoveHandler(e, Color.White);
+          }}
+        >
+          &#x2616;
+        </div>`
       )}
     `;
   }
 
-  private _clickHandler(e: MouseEvent, pt: HandPieceType) {
+  private clickPieceHandler(e: MouseEvent, pt: HandPieceType) {
     e.stopPropagation();
     const piece = new Piece(this.color, pt);
-    this.dispatchEvent(new CustomEvent("hand-clicked", { detail: { piece } }));
+    this.dispatchEvent(
+      new CustomEvent("hand-piece-clicked", { detail: { piece } })
+    );
+  }
+  private clickSideToMoveHandler(e: MouseEvent, color: Color) {
+    e.stopPropagation();
+    this.dispatchEvent(
+      new CustomEvent("hand-color-clicked", { detail: { color } })
+    );
   }
 }

@@ -74,8 +74,8 @@ export class ShogiBoard extends LitElement {
             >
               <div
                 class="shogi-cell"
-                @click=${() => this._clickHandler(sq)}
-                @dblclick=${() => this._dblclickHandler(sq)}
+                @click=${() => this.clickHandler(sq)}
+                @dblclick=${() => this.dblclickHandler(sq)}
               >
                 ${col !== null ? pieceImage(col) : nothing}
               </div>
@@ -86,10 +86,10 @@ export class ShogiBoard extends LitElement {
     </table>`;
   }
 
-  private _clickHandler(sq: Square) {
+  private clickHandler(sq: Square) {
     this.dispatchEvent(new CustomEvent("cell-click", { detail: { sq } }));
   }
-  private _dblclickHandler(sq: Square) {
+  private dblclickHandler(sq: Square) {
     const piece = this.board[sq.row][sq.col];
     if (piece !== null) {
       this.dispatchEvent(new CustomEvent("cell-dblclick", { detail: { sq } }));

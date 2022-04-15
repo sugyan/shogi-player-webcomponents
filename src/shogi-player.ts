@@ -55,8 +55,9 @@ export class ShogiPlayer extends LitElement {
     super();
     this.sfen =
       "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1";
-    [this._board, this._handBlack, this._handWhite, this._sideToMove] =
-      parseSfen(this.sfen);
+    [this.board, this.handBlack, this.handWhite, this.sideToMove] = parseSfen(
+      this.sfen
+    );
   }
 
   override attributeChangedCallback(
@@ -66,7 +67,8 @@ export class ShogiPlayer extends LitElement {
   ): void {
     if (name === "sfen" && value !== old && value !== null) {
       try {
-        [this._board, this._handBlack, this._handWhite] = parseSfen(value);
+        [this.board, this.handBlack, this.handWhite, this.sideToMove] =
+          parseSfen(value);
       } catch (e) {
         console.error(e);
       }
@@ -85,94 +87,104 @@ export class ShogiPlayer extends LitElement {
   sfen;
 
   @state()
-  private _board: Board;
+  private board: Board;
   @state()
-  private _handBlack: Hand;
+  private handBlack: Hand;
   @state()
-  private _handWhite: Hand;
+  private handWhite: Hand;
   @state()
-  private _sideToMove: Color;
+  private sideToMove: Color;
   @state()
-  private _select: Select | null = null;
+  private select: Select | null = null;
 
   override render() {
     const cursorStyles = {
-      cursor: this._select !== null ? "pointer" : "default",
+      cursor: this.select !== null ? "pointer" : "default",
     };
     return html`
       <div>${this.title}</div>
       <div class="shogi-player" style=${styleMap(cursorStyles)}>
         <div
           class="shogi-hand"
-          @click=${() => this._handAreaClickHandler(Color.White)}
+          @click=${() => this.handAreaClickHandler(Color.White)}
         >
           <shogi-hand
             class="white"
             color=${Color.White}
-            .hand=${this._handWhite}
-            .select=${this._select !== null && this._select.sq === null
-              ? this._select.piece
+            ?active=${this.sideToMove === Color.White}
+            .hand=${this.handWhite}
+            .select=${this.select !== null && this.select.sq === null
+              ? this.select.piece
               : null}
-            @hand-clicked=${this._handPieceClickHandler}
+            @hand-piece-clicked=${this.handPieceClickHandler}
+            @hand-color-clicked=${this.handColorClickHandler}
           ></shogi-hand>
         </div>
         <shogi-board
-          @cell-click=${this._cellClickHandler}
-          @cell-dblclick=${this._cellDblclickHandler}
-          .board=${this._board}
-          .select=${this._select !== null ? this._select.sq : null}
+          @cell-click=${this.cellClickHandler}
+          @cell-dblclick=${this.cellDblclickHandler}
+          .board=${this.board}
+          .select=${this.select !== null ? this.select.sq : null}
         ></shogi-board>
         <div
           class="shogi-hand"
-          @click=${() => this._handAreaClickHandler(Color.Black)}
+          @click=${() => this.handAreaClickHandler(Color.Black)}
         >
           <shogi-hand
             class="black"
             color=${Color.Black}
-            .hand=${this._handBlack}
-            .select=${this._select !== null && this._select.sq === null
-              ? this._select.piece
+            ?active=${this.sideToMove === Color.Black}
+            .hand=${this.handBlack}
+            .select=${this.select !== null && this.select.sq === null
+              ? this.select.piece
               : null}
-            @hand-clicked=${this._handPieceClickHandler}
+            @hand-piece-clicked=${this.handPieceClickHandler}
+            @hand-color-clicked=${this.handColorClickHandler}
           ></shogi-hand>
         </div>
       </div>
     `;
   }
-  private _handAreaClickHandler(c: Color) {
-    if (this._select !== null) {
-      this.movePiece(this._select.sq, c);
-      this._select = null;
+  private handAreaClickHandler(c: Color) {
+    if (this.select !== null) {
+      this.movePiece(this.select.sq, c);
+      this.select = null;
     }
   }
-  private _cellClickHandler(e: CustomEvent<{ sq: Square }>) {
-    if (this._select !== null) {
-      if (this._select.sq === null || !this._select.sq.equals(e.detail.sq)) {
-        this.movePiece(this._select.sq, e.detail.sq);
+  private cellClickHandler(e: CustomEvent<{ sq: Square }>) {
+    if (this.select !== null) {
+      if (this.select.sq === null || !this.select.sq.equals(e.detail.sq)) {
+        this.movePiece(this.select.sq, e.detail.sq);
       }
-      this._select = null;
+      this.select = null;
     } else {
       // new selection
-      const p = this._board[e.detail.sq.row][e.detail.sq.col];
+      const p = this.board[e.detail.sq.row][e.detail.sq.col];
       if (p !== null) {
-        this._select = new Select(e.detail.sq, p);
+        this.select = new Select(e.detail.sq, p);
       }
     }
   }
-  private _cellDblclickHandler(e: CustomEvent<{ sq: Square }>) {
-    if (this._select === null) {
+  private cellDblclickHandler(e: CustomEvent<{ sq: Square }>) {
+    if (this.select === null) {
       this.movePiece(e.detail.sq, e.detail.sq);
     }
   }
-  private _handPieceClickHandler(e: CustomEvent<{ piece: Piece }>) {
-    if (this._select !== null) {
-      if (this._select.piece.equals(e.detail.piece)) {
-        this._select = null;
+  private handPieceClickHandler(e: CustomEvent<{ piece: Piece }>) {
+    if (this.select !== null) {
+      if (this.select.piece.equals(e.detail.piece)) {
+        this.select = null;
       } else {
-        this._select = new Select(null, e.detail.piece);
+        this.select = new Select(null, e.detail.piece);
       }
     } else {
-      this._select = new Select(null, e.detail.piece);
+      this.select = new Select(null, e.detail.piece);
+    }
+  }
+  private handColorClickHandler(e: CustomEvent<{ color: Color }>) {
+    if (e.detail.color !== this.sideToMove) {
+      this.sideToMove = e.detail.color;
+      this.dispatchUpdateEvent();
     }
   }
   private movePiece(
@@ -180,21 +192,21 @@ export class ShogiPlayer extends LitElement {
     dst: Square | Color,
     _promotion?: boolean
   ) {
-    if (this._select === null) {
+    if (this.select === null) {
       if (!(dst instanceof Square && src !== null && src.equals(dst))) {
         return;
       }
       // double click
-      const board = this._board.map((row) => row.slice());
+      const board = this.board.map((row) => row.slice());
       const piece = board[src.row][src.col];
       if (piece !== null) {
         board[src.row][src.col] = nextPiece(piece);
       }
-      this._board = board;
+      this.board = board;
     } else {
       if (dst instanceof Square) {
-        const board = this._board.map((row) => row.slice());
-        const psrc = this._select.piece;
+        const board = this.board.map((row) => row.slice());
+        const psrc = this.select.piece;
         const pdst = board[dst.row][dst.col];
         // move the piece on the board
         if (src !== null) {
@@ -203,14 +215,14 @@ export class ShogiPlayer extends LitElement {
           // captured?
           if (pdst) {
             if (psrc.color === Color.Black) {
-              const hand = { ...this._handBlack };
+              const hand = { ...this.handBlack };
               hand[pt2hpt(pdst.pieceType)] += 1;
-              this._handBlack = hand;
+              this.handBlack = hand;
             }
             if (psrc.color === Color.White) {
-              const hand = { ...this._handWhite };
+              const hand = { ...this.handWhite };
               hand[pt2hpt(pdst.pieceType)] += 1;
-              this._handWhite = hand;
+              this.handWhite = hand;
             }
           }
         }
@@ -218,45 +230,45 @@ export class ShogiPlayer extends LitElement {
         else {
           board[dst.row][dst.col] = psrc;
           if (psrc.color === Color.Black) {
-            const hand = { ...this._handBlack };
+            const hand = { ...this.handBlack };
             hand[pt2hpt(psrc.pieceType)] -= 1;
             if (pdst !== null) {
               hand[pt2hpt(pdst.pieceType)] += 1;
             }
-            this._handBlack = hand;
+            this.handBlack = hand;
           }
           if (psrc.color === Color.White) {
-            const hand = { ...this._handWhite };
+            const hand = { ...this.handWhite };
             hand[pt2hpt(psrc.pieceType)] -= 1;
             if (pdst !== null) {
               hand[pt2hpt(pdst.pieceType)] += 1;
             }
-            this._handWhite = hand;
+            this.handWhite = hand;
           }
         }
-        this._board = board;
+        this.board = board;
       } else {
-        const piece = this._select.piece;
+        const piece = this.select.piece;
         const hpt = pt2hpt(piece.pieceType);
         // remove the piece from the board
         if (src !== null) {
-          const board = this._board.map((row) => row.slice());
+          const board = this.board.map((row) => row.slice());
           board[src.row][src.col] = null;
-          this._board = board;
+          this.board = board;
         }
         // move the hand pieces
         else if (piece.color !== dst) {
           switch (dst) {
             case Color.Black:
-              this._handWhite = {
-                ...this._handWhite,
-                [hpt]: this._handWhite[hpt] - 1,
+              this.handWhite = {
+                ...this.handWhite,
+                [hpt]: this.handWhite[hpt] - 1,
               };
               break;
             case Color.White:
-              this._handBlack = {
-                ...this._handBlack,
-                [hpt]: this._handBlack[hpt] - 1,
+              this.handBlack = {
+                ...this.handBlack,
+                [hpt]: this.handBlack[hpt] - 1,
               };
               break;
           }
@@ -265,28 +277,31 @@ export class ShogiPlayer extends LitElement {
         }
         switch (dst) {
           case Color.Black:
-            this._handBlack = {
-              ...this._handBlack,
-              [hpt]: this._handBlack[hpt] + 1,
+            this.handBlack = {
+              ...this.handBlack,
+              [hpt]: this.handBlack[hpt] + 1,
             };
             break;
           case Color.White:
-            this._handWhite = {
-              ...this._handWhite,
-              [hpt]: this._handWhite[hpt] + 1,
+            this.handWhite = {
+              ...this.handWhite,
+              [hpt]: this.handWhite[hpt] + 1,
             };
             break;
         }
       }
     }
+    this.dispatchUpdateEvent();
+  }
+  private dispatchUpdateEvent() {
     this.dispatchEvent(
       new CustomEvent<UpdateEventDetail>("update", {
         detail: {
           sfen: toSfen(
-            this._board,
-            this._handBlack,
-            this._handWhite,
-            this._sideToMove
+            this.board,
+            this.handBlack,
+            this.handWhite,
+            this.sideToMove
           ),
         },
       })
