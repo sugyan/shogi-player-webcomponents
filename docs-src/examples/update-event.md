@@ -18,9 +18,9 @@ description: Listening update event
   }
 </style>
 <div class="player">
-  <shogi-player id="player"></shogi-player>
-  <pre id="sfen">lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1</pre>
+  <shogi-player id="player" sfen="lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1"></shogi-player>
 </div>
+<pre id="sfen"></pre>
 <script>
   document.getElementById("player").addEventListener("update", (e) => {
     document.getElementById("sfen").innerText = e.detail.sfen;
@@ -28,10 +28,8 @@ description: Listening update event
 </script>
 
 ```html
-<div class="player">
-  <shogi-player id="player"></shogi-player>
-  <pre id="sfen">lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1</pre>
-</div>
+<shogi-player id="player" sfen="lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1"></shogi-player>
+<pre id="sfen"></pre>
 <script>
   document.getElementById("player").addEventListener("update", (e) => {
     document.getElementById("sfen").innerText = e.detail.sfen;

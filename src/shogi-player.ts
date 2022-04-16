@@ -69,6 +69,7 @@ export class ShogiPlayer extends LitElement {
       try {
         [this.board, this.handBlack, this.handWhite, this.sideToMove] =
           parseSfen(value);
+        this.dispatchUpdateEvent();
       } catch (e) {
         console.error(e);
       }
