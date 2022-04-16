@@ -34,30 +34,35 @@
       <nav class="collection">
         <ul>
           
-                  <li class=>
-                    <a href="name-property/">Setting the name property</a>
-                  </li>
-                
                   <li class=selected>
                     <a href="">A basic example</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="title-property/">Setting the title property</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="sfen-property/">Setting the sfen property</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="update-event/">Listening update event</a>
                   </li>
                 
         </ul>
       </nav>
       <div>
         <style>
-  shogi-player p {
-    border: solid 1px blue;
-    padding: 8px;
+  div.player {
+    width: 600px;
   }
 </style>
-<shogi-player>
-  <p>This is child content</p>
-</shogi-player>
-<h3>CSS</h3>
-<pre class="language-css"><code class="language-css"><span class="token selector">p</span> <span class="token punctuation">{</span><br>  <span class="token property">border</span><span class="token punctuation">:</span> solid 1px blue<span class="token punctuation">;</span><br>  <span class="token property">padding</span><span class="token punctuation">:</span> 8px<span class="token punctuation">;</span><br><span class="token punctuation">}</span></code></pre>
+<div class="player">
+  <shogi-player></shogi-player>
+</div>
 <h3>HTML</h3>
-<pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>shogi-player</span><span class="token punctuation">></span></span><br>  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>This is child content<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>shogi-player</span><span class="token punctuation">></span></span></code></pre>
+<pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>shogi-player</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>shogi-player</span><span class="token punctuation">></span></span></code></pre>
 
       </div>
     </section>

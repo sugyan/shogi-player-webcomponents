@@ -31,9 +31,9 @@
         
      <h1>API</h1>
      
-       <h2>&lt;shogi-player></h2>
+       <h2>&lt;shogi-board></h2>
        <div>
-         An element.
+         This is Shogi Board element.
        </div>
        
    <h3>Attributes</h3>
@@ -43,7 +43,11 @@
      </tr>
      
        <tr>
-         <td>name</td><td>The name to say "Hello" to.</td><td>string</td><td>'Shogi Player'</td>
+         <td>board</td><td></td><td>Board</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>select</td><td></td><td>Square | null</td><td>null</td>
        </tr>
      
    </table>
@@ -56,63 +60,209 @@
      </tr>
      
        <tr>
-         <td>name</td><td>name</td><td>The name to say "Hello" to.</td><td>string</td><td>'Shogi Player'</td>
+         <td>board</td><td>board</td><td></td><td>Board</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>select</td><td>select</td><td></td><td>Square | null</td><td>null</td>
        </tr>
      
    </table>
    
        
-   <h3>Methods</h3>
-   <table>
-     <tr>
-       <th>Name</th><th>Parameters</th><th>Description</th><th>Return</th>
-     </tr>
-     
-       <tr>
-         <td>sayHello</td><td>
-   
-   <table>
-     <tr>
-       <th>Name</th><th>Description</th><th>Type</th>
-     </tr>
-     
-       <tr>
-         <td>name</td><td>The name to say "Hello" to</td><td>string</td>
-       </tr>
-     
-   </table>
- </td><td>Formats a greeting</td><td>string</td>
-       </tr>
-     
-   </table>
- 
-           
        
-   <h3>Slots</h3>
+   <h3>Events</h3>
    <table>
      <tr>
        <th>Name</th><th>Description</th>
      </tr>
      
        <tr>
-         <td>(default)</td><td>This element has a slot</td>
+         <td>cell-click</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>cell-dblclick</td><td></td>
+       </tr>
+     
+   </table>
+     
+         
+       
+       
+       
+       <h2>&lt;shogi-hand></h2>
+       <div>
+         This is Shogi hand pieces element.
+       </div>
+       
+   <h3>Attributes</h3>
+   <table>
+     <tr>
+       <th>Name</th><th>Description</th><th>Type</th><th>Default</th>
+     </tr>
+     
+       <tr>
+         <td>active</td><td></td><td>boolean</td><td>false</td>
+       </tr>
+     
+       <tr>
+         <td>color</td><td></td><td>Color</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>hand</td><td></td><td>Hand</td><td>{
+    [PieceType.FU]: 0,
+    [PieceType.KY]: 0,
+    [PieceType.KE]: 0,
+    [PieceType.GI]: 0,
+    [PieceType.KI]: 0,
+    [PieceType.KA]: 0,
+    [PieceType.HI]: 0,
+    [PieceType.OU]: 0,
+  }</td>
+       </tr>
+     
+       <tr>
+         <td>select</td><td></td><td>Piece | null</td><td>null</td>
+       </tr>
+     
+   </table>
+ 
+       
+   <h3>Properties</h3>
+   <table>
+     <tr>
+       <th>Name</th><th>Attribute</th><th>Description</th><th>Type</th><th>Default</th>
+     </tr>
+     
+       <tr>
+         <td>active</td><td>active</td><td></td><td>boolean</td><td>false</td>
+       </tr>
+     
+       <tr>
+         <td>color</td><td>color</td><td></td><td>Color</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>hand</td><td>hand</td><td></td><td>Hand</td><td>{
+    [PieceType.FU]: 0,
+    [PieceType.KY]: 0,
+    [PieceType.KE]: 0,
+    [PieceType.GI]: 0,
+    [PieceType.KI]: 0,
+    [PieceType.KA]: 0,
+    [PieceType.HI]: 0,
+    [PieceType.OU]: 0,
+  }</td>
+       </tr>
+     
+       <tr>
+         <td>select</td><td>select</td><td></td><td>Piece | null</td><td>null</td>
        </tr>
      
    </table>
    
        
-   <h3>CSS Shadow Parts</h3>
+       
+   <h3>Events</h3>
    <table>
      <tr>
        <th>Name</th><th>Description</th>
      </tr>
      
        <tr>
-         <td>button</td><td>The button</td>
+         <td>hand-piece-clicked</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>hand-color-clicked</td><td></td>
+       </tr>
+     
+   </table>
+     
+         
+       
+       
+       
+       <h2>&lt;shogi-player></h2>
+       <div>
+         A Shogi Player element.
+       </div>
+       
+   <h3>Attributes</h3>
+   <table>
+     <tr>
+       <th>Name</th><th>Description</th><th>Type</th><th>Default</th>
+     </tr>
+     
+       <tr>
+         <td>title</td><td>The title of shogi player</td><td>string</td><td>""</td>
+       </tr>
+     
+       <tr>
+         <td>sfen</td><td>The SFEN representation of initial position</td><td>string</td><td>"lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1"</td>
        </tr>
      
    </table>
  
+       
+   <h3>Properties</h3>
+   <table>
+     <tr>
+       <th>Name</th><th>Attribute</th><th>Description</th><th>Type</th><th>Default</th>
+     </tr>
+     
+       <tr>
+         <td>title</td><td>title</td><td>The title of shogi player</td><td>string</td><td>""</td>
+       </tr>
+     
+       <tr>
+         <td>sfen</td><td>sfen</td><td>The SFEN representation of initial position</td><td>string</td><td>"lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1"</td>
+       </tr>
+     
+       <tr>
+         <td>board</td><td></td><td></td><td>Board</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>handBlack</td><td></td><td></td><td>Hand</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>handWhite</td><td></td><td></td><td>Hand</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>sideToMove</td><td></td><td></td><td>Color</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>select</td><td></td><td></td><td>Select | null</td><td>null</td>
+       </tr>
+     
+       <tr>
+         <td></td><td></td><td></td><td></td><td></td>
+       </tr>
+     
+   </table>
+   
+       
+       
+   <h3>Events</h3>
+   <table>
+     <tr>
+       <th>Name</th><th>Description</th>
+     </tr>
+     
+       <tr>
+         <td>update</td><td></td>
+       </tr>
+     
+   </table>
+     
+         
+       
        
        
    

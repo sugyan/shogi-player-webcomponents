@@ -7,28 +7,16 @@ description: A basic example
 ---
 
 <style>
-  shogi-player p {
-    border: solid 1px blue;
-    padding: 8px;
+  div.player {
+    width: 600px;
   }
 </style>
-<shogi-player>
-  <p>This is child content</p>
-</shogi-player>
-
-<h3>CSS</h3>
-
-```css
-p {
-  border: solid 1px blue;
-  padding: 8px;
-}
-```
+<div class="player">
+  <shogi-player></shogi-player>
+</div>
 
 <h3>HTML</h3>
 
 ```html
-<shogi-player>
-  <p>This is child content</p>
-</shogi-player>
+<shogi-player></shogi-player>
 ```

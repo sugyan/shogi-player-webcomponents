@@ -34,13 +34,13 @@ title: <shogi-player> ⌲ Home
 `<shogi-player>` can be configured with attributed in plain HTML.
 
 ```html
-<shogi-player name="HTML"></shogi-player>
+<shogi-player title="Title"></shogi-player>
 ```
 
   </div>
   <div>
 
-<shogi-player name="HTML"></shogi-player>
+<shogi-player title="Title"></shogi-player>
 
   </div>
 </section>
@@ -55,12 +55,12 @@ title: <shogi-player> ⌲ Home
 ```js
 import {html, render} from 'lit-html';
 
-const name = 'lit-html';
+const title = 'lit-html';
 
 render(
   html`
     <h2>This is a &lt;shogi-player&gt;</h2>
-    <shogi-player .name=${name}></shogi-player>
+    <shogi-player .title=${title}></shogi-player>
   `,
   document.body
 );
@@ -70,7 +70,7 @@ render(
   <div>
 
 <h2>This is a &lt;shogi-player&gt;</h2>
-<shogi-player name="lit-html"></shogi-player>
+<shogi-player title="lit-html"></shogi-player>
 
   </div>
 </section>

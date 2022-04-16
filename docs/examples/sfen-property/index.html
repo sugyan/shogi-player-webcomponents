@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><shogi-player> ⌲ Examples ⌲ Name Property</title>
+    <title><shogi-player> ⌲ Examples ⌲ SFEN Property</title>
     <link rel="stylesheet" href="../../docs.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600|Roboto+Mono">
     <link href="../../prism-okaidia.css" rel="stylesheet" />
@@ -29,25 +29,40 @@
     <div id="main-wrapper">
       <main>
         
-    <h1>Example: Name Property</h1>
+    <h1>Example: SFEN Property</h1>
     <section class="examples">
       <nav class="collection">
         <ul>
           
-                  <li class=selected>
-                    <a href="">Setting the name property</a>
+                  <li class=>
+                    <a href="../">A basic example</a>
                   </li>
                 
                   <li class=>
-                    <a href="../">A basic example</a>
+                    <a href="../title-property/">Setting the title property</a>
+                  </li>
+                
+                  <li class=selected>
+                    <a href="">Setting the sfen property</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="../update-event/">Listening update event</a>
                   </li>
                 
         </ul>
       </nav>
       <div>
-        <p><shogi-player name="Earth"></shogi-player></p>
+        <style>
+  div.player {
+    width: 600px;
+  }
+</style>
+<div class="player">
+  <shogi-player sfen="9/9/9/9/9/k8/9/9/1R2K4 b Gr2b3g4s4n4l18p 1"></shogi-player>
+</div>
 <h3>HTML</h3>
-<pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>shogi-player</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Earth<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>shogi-player</span><span class="token punctuation">></span></span></code></pre>
+<pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>shogi-player</span> <span class="token attr-name">sfen</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>9/9/9/9/9/k8/9/9/1R2K4 b Gr2b3g4s4n4l18p 1<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>shogi-player</span><span class="token punctuation">></span></span></code></pre>
 
       </div>
     </section>

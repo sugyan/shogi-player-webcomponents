@@ -64,6 +64,7 @@ export class ShogiPlayer extends LitElement {
     old: string | null,
     value: string | null
   ): void {
+    super.attributeChangedCallback(name, old, value);
     if (name === "sfen" && value !== old && value !== null) {
       try {
         [this.board, this.handBlack, this.handWhite, this.sideToMove] =
@@ -77,7 +78,7 @@ export class ShogiPlayer extends LitElement {
   /**
    * The title of shogi player
    */
-  @property({ type: String, attribute: false })
+  @property({ type: String })
   override title = "";
   /**
    * The SFEN representation of initial position
