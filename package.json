@@ -2,6 +2,11 @@
   "name": "shogi-player-webcomponents",
   "version": "0.1.1",
   "description": "A simple shogi-player web component",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sugyan/shogi-player-webcomponents"
+  },
+  "homepage": "https://sugyan.github.io/shogi-player-webcomponents/",
   "main": "./dist/shogi-player.js",
   "module": "./dist/shogi-player.js",
   "files": ["dist/*"],

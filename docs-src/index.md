@@ -5,7 +5,8 @@ title: <shogi-player> ⌲ Home
 
 # &lt;shogi-player>
 
-`<shogi-player>` is an awesome element. It's a great introduction to building web components with LitElement, with nice documentation site as well.
+`<shogi-player>` is a web component made with LitElement.
+It can represent the shogi board and hand pieces and also edit them.
 
 ## As easy as HTML
 
