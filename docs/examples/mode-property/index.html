@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><shogi-player> ⌲ Examples ⌲ Title Property</title>
+    <title><shogi-player> ⌲ Examples ⌲ Mode Property</title>
     <link rel="stylesheet" href="../../docs.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600|Roboto+Mono">
     <link href="../../prism-okaidia.css" rel="stylesheet" />
@@ -30,7 +30,7 @@
     <div id="main-wrapper">
       <main>
         
-    <h1>Example: Title Property</h1>
+    <h1>Example: Mode Property</h1>
     <section class="examples">
       <nav class="collection">
         <ul>
@@ -39,12 +39,12 @@
                     <a href="../">A basic example</a>
                   </li>
                 
-                  <li class=>
-                    <a href="../sfen-property/">Setting the sfen property</a>
+                  <li class=selected>
+                    <a href="">Setting the mode property</a>
                   </li>
                 
-                  <li class=selected>
-                    <a href="">Setting the title property</a>
+                  <li class=>
+                    <a href="../sfen-property/">Setting the sfen property</a>
                   </li>
                 
                   <li class=>
@@ -54,16 +54,17 @@
         </ul>
       </nav>
       <div>
-        <style>
+        <p><code>&lt;shogi-player&gt;</code> can set the <code>mode</code> to <code>show</code> (default) or <code>edit</code>.</p>
+<style>
   div.player {
     width: 600px;
   }
 </style>
 <div class="player">
-  <shogi-player title="Title"></shogi-player>
+  <shogi-player mode="edit" title="Editable player"></shogi-player>
 </div>
 <h3>HTML</h3>
-<pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>shogi-player</span> <span class="token attr-name">title</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Title<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>shogi-player</span><span class="token punctuation">></span></span></code></pre>
+<pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>shogi-player</span> <span class="token attr-name">mode</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>edit<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>shogi-player</span><span class="token punctuation">></span></span></code></pre>
 
       </div>
     </section>
