@@ -1,10 +1,10 @@
 {
-  "name": "@lit/lit-starter-ts",
-  "private": true,
-  "version": "1.0.2",
-  "description": "A simple web component",
+  "name": "shogi-player-webcomponents",
+  "version": "0.1.1",
+  "description": "A simple shogi-player web component",
   "main": "./dist/shogi-player.js",
   "module": "./dist/shogi-player.js",
+  "files": ["dist/*"],
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -36,7 +36,8 @@
     "web-components",
     "lit-element",
     "typescript",
-    "lit"
+    "lit",
+    "shogi"
   ],
   "author": "Google LLC",
   "license": "BSD-3-Clause",
