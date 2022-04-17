@@ -34,10 +34,12 @@ export class ShogiHand extends LitElement {
     :not(:host([active]) .side-to-move) {
       color: gray;
     }
+    :host([editable]) .side-to-move {
+      cursor: pointer;
+    }
     .side-to-move {
       text-align: center;
       font-size: x-large;
-      cursor: pointer;
     }
     .hand-list {
       list-style: none;
@@ -51,10 +53,12 @@ export class ShogiHand extends LitElement {
       padding-left: 0em;
       padding-right: 1.6em;
     }
+    :host([editable]) .hand-piece {
+      cursor: pointer;
+    }
     .hand-piece {
       width: 100%;
       white-space: nowrap;
-      cursor: pointer;
     }
     .hand-piece.selected {
       background-color: gold;
@@ -65,7 +69,8 @@ export class ShogiHand extends LitElement {
     }
   `;
 
-  @property({ type: Boolean, reflect: true }) active = false;
+  @property({ type: Boolean }) active = false;
+  @property({ type: Boolean }) editable = false;
   @property({ type: String }) color: Color = Color.Black;
   @property({ type: Object }) hand: Hand = {
     [PieceType.FU]: 0,
@@ -131,15 +136,19 @@ export class ShogiHand extends LitElement {
 
   private clickPieceHandler(e: MouseEvent, pt: HandPieceType) {
     e.stopPropagation();
-    const piece = new Piece(this.color, pt);
-    this.dispatchEvent(
-      new CustomEvent("hand-piece-clicked", { detail: { piece } })
-    );
+    if (this.editable) {
+      const piece = new Piece(this.color, pt);
+      this.dispatchEvent(
+        new CustomEvent("hand-piece-clicked", { detail: { piece } })
+      );
+    }
   }
   private clickSideToMoveHandler(e: MouseEvent, color: Color) {
     e.stopPropagation();
-    this.dispatchEvent(
-      new CustomEvent("hand-color-clicked", { detail: { color } })
-    );
+    if (this.editable) {
+      this.dispatchEvent(
+        new CustomEvent("hand-color-clicked", { detail: { color } })
+      );
+    }
   }
 }

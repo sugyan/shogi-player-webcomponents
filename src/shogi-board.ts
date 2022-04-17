@@ -48,6 +48,7 @@ export class ShogiBoard extends LitElement {
     }
   `;
 
+  @property({ type: Boolean }) editable = false;
   @property({
     type: Array,
   })
@@ -66,7 +67,9 @@ export class ShogiBoard extends LitElement {
             };
             const styles = {
               cursor:
-                this.select !== null || col !== null ? "pointer" : "inherit",
+                this.editable && (this.select !== null || col !== null)
+                  ? "pointer"
+                  : "inherit",
             };
             return html`<td
               class=${classMap(classes)}
@@ -87,12 +90,18 @@ export class ShogiBoard extends LitElement {
   }
 
   private clickHandler(sq: Square) {
-    this.dispatchEvent(new CustomEvent("cell-click", { detail: { sq } }));
+    if (this.editable) {
+      this.dispatchEvent(new CustomEvent("cell-click", { detail: { sq } }));
+    }
   }
   private dblclickHandler(sq: Square) {
-    const piece = this.board[sq.row][sq.col];
-    if (piece !== null) {
-      this.dispatchEvent(new CustomEvent("cell-dblclick", { detail: { sq } }));
+    if (this.editable) {
+      const piece = this.board[sq.row][sq.col];
+      if (piece !== null) {
+        this.dispatchEvent(
+          new CustomEvent("cell-dblclick", { detail: { sq } })
+        );
+      }
     }
   }
 }

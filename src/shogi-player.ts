@@ -8,7 +8,7 @@ import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { styleMap } from "lit/directives/style-map.js";
 import { ShogiBoard } from "./shogi-board";
-import { Board, Color, Hand, Piece, Square } from "./types";
+import { Board, Color, Hand, Mode, Piece, Square } from "./types";
 import { nextPiece, pt2hpt } from "./utils";
 import { parseSfen, toSfen } from "./sfen";
 import "./shogi-board";
@@ -74,6 +74,21 @@ export class ShogiPlayer extends LitElement {
         console.error(e);
       }
     }
+    if (name === "mode" && value !== old && value !== null) {
+      switch (value) {
+        case "show":
+          this.mode = Mode.Show;
+          break;
+        case "edit":
+          this.mode = Mode.Edit;
+          break;
+        case "play":
+          this.mode = Mode.Play;
+          break;
+        default:
+          throw new Error(`Unknown mode: ${value}`);
+      }
+    }
   }
 
   /**
@@ -84,8 +99,13 @@ export class ShogiPlayer extends LitElement {
   /**
    * The SFEN representation of initial position
    */
-  @property({ type: String, attribute: true })
+  @property({ type: String })
   sfen;
+  /**
+   * The mode of shogi player
+   */
+  @property({ type: String })
+  mode: Mode = Mode.Show;
 
   @state()
   private board: Board;
@@ -100,7 +120,8 @@ export class ShogiPlayer extends LitElement {
 
   override render() {
     const cursorStyles = {
-      cursor: this.select !== null ? "pointer" : "default",
+      cursor:
+        this.mode === Mode.Edit && this.select !== null ? "pointer" : "default",
     };
     return html`
       <div>${this.title}</div>
@@ -113,6 +134,7 @@ export class ShogiPlayer extends LitElement {
             class="white"
             color=${Color.White}
             ?active=${this.sideToMove === Color.White}
+            ?editable=${this.mode === Mode.Edit}
             .hand=${this.handWhite}
             .select=${this.select !== null && this.select.sq === null
               ? this.select.piece
@@ -122,10 +144,11 @@ export class ShogiPlayer extends LitElement {
           ></shogi-hand>
         </div>
         <shogi-board
-          @cell-click=${this.cellClickHandler}
-          @cell-dblclick=${this.cellDblclickHandler}
           .board=${this.board}
           .select=${this.select !== null ? this.select.sq : null}
+          ?editable=${this.mode === Mode.Edit}
+          @cell-click=${this.cellClickHandler}
+          @cell-dblclick=${this.cellDblclickHandler}
         ></shogi-board>
         <div
           class="shogi-hand"
@@ -135,6 +158,7 @@ export class ShogiPlayer extends LitElement {
             class="black"
             color=${Color.Black}
             ?active=${this.sideToMove === Color.Black}
+            ?editable=${this.mode === Mode.Edit}
             .hand=${this.handBlack}
             .select=${this.select !== null && this.select.sq === null
               ? this.select.piece
