@@ -3,7 +3,7 @@ layout: example.11ty.cjs
 title: <shogi-player> ⌲ Examples ⌲ Update Event
 tags: example
 name: Update Event
-description: Listening update event
+description: Listening to the update event
 ---
 
 <style>
