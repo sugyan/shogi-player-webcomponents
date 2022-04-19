@@ -88,28 +88,30 @@ function p2sfen(p: Piece): string {
   }
 }
 
-export function parseSfen(sfen: string): [Board, Hand, Hand, Color] {
+export function parseSfen(sfen: string): [Board, [Hand, Hand], Color] {
   const board = Array.from(Array(9), () => Array(9).fill(null));
-  const handBlack = {
-    [PieceType.FU]: 0,
-    [PieceType.KY]: 0,
-    [PieceType.KE]: 0,
-    [PieceType.GI]: 0,
-    [PieceType.KI]: 0,
-    [PieceType.KA]: 0,
-    [PieceType.HI]: 0,
-    [PieceType.OU]: 0,
-  };
-  const handWhite = {
-    [PieceType.FU]: 0,
-    [PieceType.KY]: 0,
-    [PieceType.KE]: 0,
-    [PieceType.GI]: 0,
-    [PieceType.KI]: 0,
-    [PieceType.KA]: 0,
-    [PieceType.HI]: 0,
-    [PieceType.OU]: 0,
-  };
+  const hands: [Hand, Hand] = [
+    {
+      [PieceType.FU]: 0,
+      [PieceType.KY]: 0,
+      [PieceType.KE]: 0,
+      [PieceType.GI]: 0,
+      [PieceType.KI]: 0,
+      [PieceType.KA]: 0,
+      [PieceType.HI]: 0,
+      [PieceType.OU]: 0,
+    },
+    {
+      [PieceType.FU]: 0,
+      [PieceType.KY]: 0,
+      [PieceType.KE]: 0,
+      [PieceType.GI]: 0,
+      [PieceType.KI]: 0,
+      [PieceType.KA]: 0,
+      [PieceType.HI]: 0,
+      [PieceType.OU]: 0,
+    },
+  ];
   const parts = sfen.split(" ");
   const rows = parts[0].split("/", 9);
   if (rows.length !== 9) {
@@ -166,21 +168,20 @@ export function parseSfen(sfen: string): [Board, Hand, Hand, Color] {
       }
       switch (piece.color) {
         case Color.Black:
-          handBlack[pt] += num;
+          hands[0][pt] += num;
           break;
         case Color.White:
-          handWhite[pt] += num;
+          hands[1][pt] += num;
           break;
       }
     }
   }
-  return [board, handBlack, handWhite, sideToMove];
+  return [board, hands, sideToMove];
 }
 
 export function toSfen(
   board: Board,
-  handBlack: Hand,
-  handWhite: Hand,
+  hands: [Hand, Hand],
   sideToMove: Color
 ): string {
   const parts = ["", "", "-", "1"];
@@ -206,7 +207,6 @@ export function toSfen(
       return s;
     })
     .join("/");
-  // TODO: side to move
   switch (sideToMove) {
     case Color.Black:
       parts[1] = "b";
@@ -215,12 +215,9 @@ export function toSfen(
       parts[1] = "w";
       break;
   }
-  if (
-    Object.values(handBlack).some((v) => v > 0) ||
-    Object.values(handWhite).some((v) => v > 0)
-  ) {
+  if (hands.some((hand) => Object.values(hand).some((v) => v > 0))) {
     parts[2] = "";
-    [handBlack, handWhite].forEach((hand: Hand, index: number) => {
+    hands.forEach((hand: Hand, index: number) => {
       Array.from(HAND_KEYS)
         .reverse()
         .forEach((hpt: HandPieceType) => {
@@ -234,5 +231,6 @@ export function toSfen(
         });
     });
   }
+  // TODO: ply
   return parts.join(" ");
 }

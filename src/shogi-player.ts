@@ -8,23 +8,16 @@ import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { styleMap } from "lit/directives/style-map.js";
 import { ShogiBoard } from "./shogi-board";
-import { Board, Color, Hand, Mode, Piece, Square } from "./types";
-import { nextPiece, pt2hpt } from "./utils";
-import { parseSfen, toSfen } from "./sfen";
+import { ShogiHand } from "./shogi-hand";
+import { Color, Mode, Piece, Square } from "./types";
+import { parseSfen } from "./sfen";
+import { nextPiece } from "./utils";
+import { Select, Shogi } from "./shogi";
 import "./shogi-board";
 import "./shogi-hand";
 
 interface UpdateEventDetail {
   sfen: string;
-}
-
-class Select {
-  readonly sq: Square | null;
-  readonly piece: Piece;
-  constructor(sq: Square | null, piece: Piece) {
-    this.sq = sq;
-    this.piece = piece;
-  }
 }
 
 /**
@@ -54,9 +47,7 @@ export class ShogiPlayer extends LitElement {
     super();
     this.sfen =
       "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1";
-    [this.board, this.handBlack, this.handWhite, this.sideToMove] = parseSfen(
-      this.sfen
-    );
+    this.shogi = new Shogi(...parseSfen(this.sfen));
   }
 
   override attributeChangedCallback(
@@ -67,8 +58,7 @@ export class ShogiPlayer extends LitElement {
     super.attributeChangedCallback(name, old, value);
     if (name === "sfen" && value !== old && value !== null) {
       try {
-        [this.board, this.handBlack, this.handWhite, this.sideToMove] =
-          parseSfen(value);
+        this.shogi = new Shogi(...parseSfen(this.sfen));
         this.dispatchUpdateEvent();
       } catch (e) {
         console.error(e);
@@ -108,15 +98,10 @@ export class ShogiPlayer extends LitElement {
   mode: Mode = Mode.Show;
 
   @state()
-  private board: Board;
-  @state()
-  private handBlack: Hand;
-  @state()
-  private handWhite: Hand;
-  @state()
-  private sideToMove: Color;
-  @state()
   private select: Select | null = null;
+
+  @state()
+  private shogi: Shogi;
 
   override render() {
     const cursorStyles = {
@@ -133,9 +118,9 @@ export class ShogiPlayer extends LitElement {
           <shogi-hand
             class="white"
             color=${Color.White}
-            ?active=${this.sideToMove === Color.White}
+            ?active=${this.shogi.color === Color.White}
             ?editable=${this.mode === Mode.Edit}
-            .hand=${this.handWhite}
+            .hand=${this.shogi.hand(Color.White)}
             .select=${this.select !== null && this.select.sq === null
               ? this.select.piece
               : null}
@@ -144,7 +129,7 @@ export class ShogiPlayer extends LitElement {
           ></shogi-hand>
         </div>
         <shogi-board
-          .board=${this.board}
+          .board=${this.shogi.board}
           .select=${this.select !== null ? this.select.sq : null}
           ?editable=${this.mode === Mode.Edit}
           @cell-click=${this.cellClickHandler}
@@ -157,9 +142,9 @@ export class ShogiPlayer extends LitElement {
           <shogi-hand
             class="black"
             color=${Color.Black}
-            ?active=${this.sideToMove === Color.Black}
+            ?active=${this.shogi.color === Color.Black}
             ?editable=${this.mode === Mode.Edit}
-            .hand=${this.handBlack}
+            .hand=${this.shogi.hand(Color.Black)}
             .select=${this.select !== null && this.select.sq === null
               ? this.select.piece
               : null}
@@ -184,7 +169,7 @@ export class ShogiPlayer extends LitElement {
       this.select = null;
     } else {
       // new selection
-      const p = this.board[e.detail.sq.row][e.detail.sq.col];
+      const p = this.shogi.board[e.detail.sq.row][e.detail.sq.col];
       if (p !== null) {
         this.select = new Select(e.detail.sq, p);
       }
@@ -192,7 +177,15 @@ export class ShogiPlayer extends LitElement {
   }
   private cellDblclickHandler(e: CustomEvent<{ sq: Square }>) {
     if (this.select === null) {
-      this.movePiece(e.detail.sq, e.detail.sq);
+      const sq = e.detail.sq;
+      const board = this.shogi.board;
+      const piece = board[sq.row][sq.col];
+      if (piece === null) {
+        return;
+      }
+      board[sq.row][sq.col] = nextPiece(piece);
+      this.shogi = new Shogi(board, this.shogi.hands, this.shogi.color);
+      this.dispatchUpdateEvent();
     }
   }
   private handPieceClickHandler(e: CustomEvent<{ piece: Piece }>) {
@@ -207,127 +200,26 @@ export class ShogiPlayer extends LitElement {
     }
   }
   private handColorClickHandler(e: CustomEvent<{ color: Color }>) {
-    if (e.detail.color !== this.sideToMove) {
-      this.sideToMove = e.detail.color;
+    if (e.detail.color !== this.shogi.color) {
+      this.shogi = new Shogi(
+        this.shogi.board,
+        this.shogi.hands,
+        e.detail.color
+      );
       this.dispatchUpdateEvent();
     }
   }
-  private movePiece(
-    src: Square | null,
-    dst: Square | Color,
-    _promotion?: boolean
-  ) {
-    if (this.select === null) {
-      if (!(dst instanceof Square && src !== null && src.equals(dst))) {
-        return;
-      }
-      // double click
-      const board = this.board.map((row) => row.slice());
-      const piece = board[src.row][src.col];
-      if (piece !== null) {
-        board[src.row][src.col] = nextPiece(piece);
-      }
-      this.board = board;
-    } else {
-      if (dst instanceof Square) {
-        const board = this.board.map((row) => row.slice());
-        const psrc = this.select.piece;
-        const pdst = board[dst.row][dst.col];
-        // move the piece on the board
-        if (src !== null) {
-          board[src.row][src.col] = null;
-          board[dst.row][dst.col] = psrc;
-          // captured?
-          if (pdst) {
-            if (psrc.color === Color.Black) {
-              const hand = { ...this.handBlack };
-              hand[pt2hpt(pdst.pieceType)] += 1;
-              this.handBlack = hand;
-            }
-            if (psrc.color === Color.White) {
-              const hand = { ...this.handWhite };
-              hand[pt2hpt(pdst.pieceType)] += 1;
-              this.handWhite = hand;
-            }
-          }
-        }
-        // drop the piece to the board
-        else {
-          board[dst.row][dst.col] = psrc;
-          if (psrc.color === Color.Black) {
-            const hand = { ...this.handBlack };
-            hand[pt2hpt(psrc.pieceType)] -= 1;
-            if (pdst !== null) {
-              hand[pt2hpt(pdst.pieceType)] += 1;
-            }
-            this.handBlack = hand;
-          }
-          if (psrc.color === Color.White) {
-            const hand = { ...this.handWhite };
-            hand[pt2hpt(psrc.pieceType)] -= 1;
-            if (pdst !== null) {
-              hand[pt2hpt(pdst.pieceType)] += 1;
-            }
-            this.handWhite = hand;
-          }
-        }
-        this.board = board;
-      } else {
-        const piece = this.select.piece;
-        const hpt = pt2hpt(piece.pieceType);
-        // remove the piece from the board
-        if (src !== null) {
-          const board = this.board.map((row) => row.slice());
-          board[src.row][src.col] = null;
-          this.board = board;
-        }
-        // move the hand pieces
-        else if (piece.color !== dst) {
-          switch (dst) {
-            case Color.Black:
-              this.handWhite = {
-                ...this.handWhite,
-                [hpt]: this.handWhite[hpt] - 1,
-              };
-              break;
-            case Color.White:
-              this.handBlack = {
-                ...this.handBlack,
-                [hpt]: this.handBlack[hpt] - 1,
-              };
-              break;
-          }
-        } else {
-          return;
-        }
-        switch (dst) {
-          case Color.Black:
-            this.handBlack = {
-              ...this.handBlack,
-              [hpt]: this.handBlack[hpt] + 1,
-            };
-            break;
-          case Color.White:
-            this.handWhite = {
-              ...this.handWhite,
-              [hpt]: this.handWhite[hpt] + 1,
-            };
-            break;
-        }
-      }
+  private movePiece(src: Square | null, dst: Square | Color) {
+    if (this.select !== null) {
+      this.shogi = this.shogi.movePiece(src, dst, this.select);
+      this.dispatchUpdateEvent();
     }
-    this.dispatchUpdateEvent();
   }
   private dispatchUpdateEvent() {
     this.dispatchEvent(
       new CustomEvent<UpdateEventDetail>("update", {
         detail: {
-          sfen: toSfen(
-            this.board,
-            this.handBlack,
-            this.handWhite,
-            this.sideToMove
-          ),
+          sfen: this.shogi.sfen,
         },
       })
     );
@@ -338,5 +230,6 @@ declare global {
   interface HTMLElementTagNameMap {
     "shogi-player": ShogiPlayer;
     "shogi-board": ShogiBoard;
+    "shogi-hand": ShogiHand;
   }
 }
