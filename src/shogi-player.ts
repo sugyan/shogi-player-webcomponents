@@ -9,7 +9,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import { styleMap } from "lit/directives/style-map.js";
 import { ShogiBoard } from "./shogi-board";
 import { ShogiHand } from "./shogi-hand";
-import { Color, Mode, Piece, Square } from "./types";
+import { Color, Mode, Move, Piece, Square } from "./types";
 import { parseSfen } from "./sfen";
 import { nextPiece } from "./utils";
 import { Select, Shogi } from "./shogi";
@@ -104,6 +104,7 @@ export class ShogiPlayer extends LitElement {
   private shogi: Shogi;
 
   override render() {
+    const selectables = new Set(this.shogi.legalMoves.map((m: Move) => m.from));
     const cursorStyles = {
       cursor:
         this.mode === Mode.Edit && this.select !== null ? "pointer" : "default",
@@ -131,6 +132,7 @@ export class ShogiPlayer extends LitElement {
         <shogi-board
           .board=${this.shogi.board}
           .select=${this.select !== null ? this.select.sq : null}
+          .selectables=${selectables}
           ?editable=${this.mode === Mode.Edit}
           @cell-click=${this.cellClickHandler}
           @cell-dblclick=${this.cellDblclickHandler}

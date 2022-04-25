@@ -54,6 +54,7 @@ export class ShogiBoard extends LitElement {
   })
   board: Board = Array(9).fill(Array(9).fill(null));
   @property({ type: Object }) select: Square | null = null;
+  @property({ type: Object }) selectables: Set<Square> = new Set();
 
   override render() {
     return html`<table>

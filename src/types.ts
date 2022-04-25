@@ -155,3 +155,10 @@ export type BoardPiece = Piece | null;
 export type Board = BoardPiece[][];
 
 export type Hand = { [key in HandPieceType]: number };
+
+export interface Move {
+  from: Square | null;
+  to: Square;
+  piece: Piece;
+  promotion: boolean;
+}

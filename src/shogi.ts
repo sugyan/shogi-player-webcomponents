@@ -1,4 +1,4 @@
-import { Board, Color, Hand, Piece, Square } from "./types";
+import { Board, Color, Hand, Move, Piece, PieceType, Square } from "./types";
 import { toSfen } from "./sfen";
 import { pt2hpt } from "./utils";
 
@@ -32,6 +32,17 @@ export class Shogi {
   }
   get sfen(): string {
     return toSfen(this.board, this.hands, this.color);
+  }
+  get legalMoves(): Move[] {
+    const moves: Move[] = [];
+    this.board.forEach((row, i) => {
+      row.forEach((col, j) => {
+        if (col !== null && col.color === this.color) {
+          moves.push(...this.getMoves(new Square(i, j), col));
+        }
+      });
+    });
+    return moves;
   }
   hand(color: Color): Hand {
     switch (color) {
@@ -105,5 +116,92 @@ export class Shogi {
       }
     }
     return this;
+  }
+  private getMoves(sq: Square, piece: Piece): Move[] {
+    const moves: Move[] = [];
+    const directions: [[number, number][], [number, number][]] = [[], []];
+    // prettier-ignore
+    switch (piece.pieceType) {
+      case PieceType.FU:
+        directions[0] = [[-1, 0]];
+        break;
+      case PieceType.KY:
+        directions[1] = [[-1, 0]];
+        break;
+      case PieceType.KE:
+        directions[0] = [[-2, -1], [-2, 1]];
+        break;
+      case PieceType.GI:
+        directions[0] = [[-1, -1], [-1,  0], [-1,  1], [ 1, -1], [ 1,  1]];
+        break;
+      case PieceType.TO:
+        // fallthrough
+      case PieceType.NY:
+        // fallthrough
+      case PieceType.NK:
+        // fallthrough
+      case PieceType.NG:
+        // fallthrough
+      case PieceType.KI:
+        directions[0] = [[-1, -1], [-1,  0], [-1,  1], [ 0, -1], [ 0,  1], [ 1,  0]];
+        break;
+      case PieceType.KA:
+        directions[1] = [[-1, -1], [-1,  1], [ 1, -1], [ 1,  1]];
+        break;
+      case PieceType.HI:
+        directions[1] = [[-1,  0], [ 0, -1], [ 0,  1], [ 1,  0]];
+        break;
+      case PieceType.OU:
+        directions[0] = [[-1, -1], [-1,  0], [-1,  1], [ 0, -1], [ 0,  1], [ 1, -1], [ 1,  0], [ 1,  1]];
+        break;
+      case PieceType.UM:
+        directions[0] = [[-1,  0], [ 0, -1], [ 0,  1], [ 1,  0]];
+        directions[1] = [[-1, -1], [-1,  1], [ 1, -1], [ 1,  1]];
+        break;
+      case PieceType.RY:
+        directions[0] = [[-1, -1], [-1,  1], [ 1, -1], [ 1,  1]];
+        directions[1] = [[-1,  0], [ 0, -1], [ 0,  1], [ 1,  0]];
+        break;
+    }
+    directions[0].forEach((d) => {
+      const [row, col] = [
+        sq.row + d[0] * (piece.color === Color.Black ? 1 : -1),
+        sq.col + d[1],
+      ];
+      if (0 <= row && row < 9 && 0 <= col && col < 9) {
+        const p = this.board[row][col];
+        if (p === null || p.color !== piece.color) {
+          moves.push({
+            from: sq,
+            to: new Square(row, col),
+            piece,
+            promotion: false,
+          });
+        }
+      }
+    });
+    directions[1].forEach((d) => {
+      let [row, col] = [
+        sq.row + d[0] * (piece.color === Color.Black ? 1 : -1),
+        sq.col + d[1],
+      ];
+      while (0 <= row && row < 9 && 0 <= col && col < 9) {
+        const p = this.board[row][col];
+        if (p === null || p.color !== piece.color) {
+          moves.push({
+            from: sq,
+            to: new Square(row, col),
+            piece,
+            promotion: false,
+          });
+        }
+        if (p !== null) {
+          break;
+        }
+        row += d[0] * (piece.color === Color.Black ? 1 : -1);
+        col += d[1];
+      }
+    });
+    return moves;
   }
 }
