@@ -56,27 +56,27 @@ export class ShogiPlayer extends LitElement {
     value: string | null
   ): void {
     super.attributeChangedCallback(name, old, value);
-    if (name === "sfen" && value !== old && value !== null) {
-      try {
-        this.shogi = new Shogi(...parseSfen(this.sfen));
-        this.dispatchUpdateEvent();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    if (name === "mode" && value !== old && value !== null) {
-      switch (value) {
-        case "show":
-          this.mode = Mode.Show;
+    if (value !== old && value !== null) {
+      switch (name) {
+        case "sfen":
+          this.shogi = new Shogi(...parseSfen(this.sfen));
+          this.dispatchUpdateEvent();
           break;
-        case "edit":
-          this.mode = Mode.Edit;
+        case "mode":
+          switch (value) {
+            case "show":
+              this.mode = Mode.Show;
+              break;
+            case "edit":
+              this.mode = Mode.Edit;
+              break;
+            case "play":
+              this.mode = Mode.Play;
+              break;
+            default:
+              throw new Error(`Unknown mode: ${value}`);
+          }
           break;
-        case "play":
-          this.mode = Mode.Play;
-          break;
-        default:
-          throw new Error(`Unknown mode: ${value}`);
       }
     }
   }
