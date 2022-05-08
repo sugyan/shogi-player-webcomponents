@@ -27,10 +27,11 @@ interface UpdateEventDetail {
 export class ShogiPlayer extends LitElement {
   static override styles = css`
     :host {
-      min-width: 500px;
+      min-width: 320px;
       display: block;
       padding: 16px;
       font-family: sans-serif;
+      touch-action: manipulation;
     }
     .shogi-player {
       display: flex;
@@ -133,7 +134,6 @@ export class ShogiPlayer extends LitElement {
           .select=${this.select !== null ? this.select.sq : null}
           ?editable=${this.mode === Mode.Edit}
           @cell-click=${this.cellClickHandler}
-          @cell-dblclick=${this.cellDblclickHandler}
         ></shogi-board>
         <div
           class="shogi-hand"
@@ -163,7 +163,20 @@ export class ShogiPlayer extends LitElement {
   }
   private cellClickHandler(e: CustomEvent<{ sq: Square }>) {
     if (this.select !== null) {
-      if (this.select.sq === null || !this.select.sq.equals(e.detail.sq)) {
+      // change to next piece (Edit mode only)
+      if (
+        this.select.sq !== null &&
+        this.select.sq.equals(e.detail.sq) &&
+        this.mode === Mode.Edit
+      ) {
+        const sq = this.select.sq;
+        const board = this.shogi.board;
+        board[sq.row][sq.col] = nextPiece(this.select.piece);
+        this.shogi = new Shogi(board, this.shogi.hands, this.shogi.color);
+        this.dispatchUpdateEvent();
+      }
+      // move piece
+      else {
         this.movePiece(this.select.sq, e.detail.sq);
       }
       this.select = null;
@@ -173,19 +186,6 @@ export class ShogiPlayer extends LitElement {
       if (p !== null) {
         this.select = new Select(e.detail.sq, p);
       }
-    }
-  }
-  private cellDblclickHandler(e: CustomEvent<{ sq: Square }>) {
-    if (this.select === null) {
-      const sq = e.detail.sq;
-      const board = this.shogi.board;
-      const piece = board[sq.row][sq.col];
-      if (piece === null) {
-        return;
-      }
-      board[sq.row][sq.col] = nextPiece(piece);
-      this.shogi = new Shogi(board, this.shogi.hands, this.shogi.color);
-      this.dispatchUpdateEvent();
     }
   }
   private handPieceClickHandler(e: CustomEvent<{ piece: Piece }>) {
