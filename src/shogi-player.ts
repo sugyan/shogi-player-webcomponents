@@ -27,10 +27,11 @@ interface UpdateEventDetail {
 export class ShogiPlayer extends LitElement {
   static override styles = css`
     :host {
-      min-width: 500px;
+      min-width: 320px;
       display: block;
       padding: 16px;
       font-family: sans-serif;
+      touch-action: manipulation;
     }
     .shogi-player {
       display: flex;
@@ -56,27 +57,27 @@ export class ShogiPlayer extends LitElement {
     value: string | null
   ): void {
     super.attributeChangedCallback(name, old, value);
-    if (name === "sfen" && value !== old && value !== null) {
-      try {
-        this.shogi = new Shogi(...parseSfen(this.sfen));
-        this.dispatchUpdateEvent();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    if (name === "mode" && value !== old && value !== null) {
-      switch (value) {
-        case "show":
-          this.mode = Mode.Show;
+    if (value !== old && value !== null) {
+      switch (name) {
+        case "sfen":
+          this.shogi = new Shogi(...parseSfen(this.sfen));
+          this.dispatchUpdateEvent();
           break;
-        case "edit":
-          this.mode = Mode.Edit;
+        case "mode":
+          switch (value) {
+            case "show":
+              this.mode = Mode.Show;
+              break;
+            case "edit":
+              this.mode = Mode.Edit;
+              break;
+            case "play":
+              this.mode = Mode.Play;
+              break;
+            default:
+              throw new Error(`Unknown mode: ${value}`);
+          }
           break;
-        case "play":
-          this.mode = Mode.Play;
-          break;
-        default:
-          throw new Error(`Unknown mode: ${value}`);
       }
     }
   }
@@ -135,7 +136,6 @@ export class ShogiPlayer extends LitElement {
           .selectables=${selectables}
           ?editable=${this.mode === Mode.Edit}
           @cell-click=${this.cellClickHandler}
-          @cell-dblclick=${this.cellDblclickHandler}
         ></shogi-board>
         <div
           class="shogi-hand"
@@ -165,7 +165,20 @@ export class ShogiPlayer extends LitElement {
   }
   private cellClickHandler(e: CustomEvent<{ sq: Square }>) {
     if (this.select !== null) {
-      if (this.select.sq === null || !this.select.sq.equals(e.detail.sq)) {
+      // change to next piece (Edit mode only)
+      if (
+        this.select.sq !== null &&
+        this.select.sq.equals(e.detail.sq) &&
+        this.mode === Mode.Edit
+      ) {
+        const sq = this.select.sq;
+        const board = this.shogi.board;
+        board[sq.row][sq.col] = nextPiece(this.select.piece);
+        this.shogi = new Shogi(board, this.shogi.hands, this.shogi.color);
+        this.dispatchUpdateEvent();
+      }
+      // move piece
+      else {
         this.movePiece(this.select.sq, e.detail.sq);
       }
       this.select = null;
@@ -175,19 +188,6 @@ export class ShogiPlayer extends LitElement {
       if (p !== null) {
         this.select = new Select(e.detail.sq, p);
       }
-    }
-  }
-  private cellDblclickHandler(e: CustomEvent<{ sq: Square }>) {
-    if (this.select === null) {
-      const sq = e.detail.sq;
-      const board = this.shogi.board;
-      const piece = board[sq.row][sq.col];
-      if (piece === null) {
-        return;
-      }
-      board[sq.row][sq.col] = nextPiece(piece);
-      this.shogi = new Shogi(board, this.shogi.hands, this.shogi.color);
-      this.dispatchUpdateEvent();
     }
   }
   private handPieceClickHandler(e: CustomEvent<{ piece: Piece }>) {

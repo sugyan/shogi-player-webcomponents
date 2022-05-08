@@ -48,6 +48,13 @@ export class ShogiBoard extends LitElement {
     }
   `;
 
+  constructor() {
+    super();
+    this.addEventListener("click", (e: MouseEvent) => {
+      e.preventDefault();
+    });
+  }
+
   @property({ type: Boolean }) editable = false;
   @property({
     type: Array,
@@ -76,11 +83,7 @@ export class ShogiBoard extends LitElement {
               class=${classMap(classes)}
               style=${styleMap(styles)}
             >
-              <div
-                class="shogi-cell"
-                @click=${() => this.clickHandler(sq)}
-                @dblclick=${() => this.dblclickHandler(sq)}
-              >
+              <div class="shogi-cell" @click=${() => this.clickHandler(sq)}>
                 ${col !== null ? pieceImage(col) : nothing}
               </div>
             </td>`;
@@ -93,16 +96,6 @@ export class ShogiBoard extends LitElement {
   private clickHandler(sq: Square) {
     if (this.editable) {
       this.dispatchEvent(new CustomEvent("cell-click", { detail: { sq } }));
-    }
-  }
-  private dblclickHandler(sq: Square) {
-    if (this.editable) {
-      const piece = this.board[sq.row][sq.col];
-      if (piece !== null) {
-        this.dispatchEvent(
-          new CustomEvent("cell-dblclick", { detail: { sq } })
-        );
-      }
     }
   }
 }
