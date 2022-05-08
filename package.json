@@ -1,6 +1,6 @@
 {
   "name": "shogi-player-webcomponents",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A simple shogi-player web component",
   "repository": {
     "type": "git",
@@ -44,7 +44,11 @@
     "lit",
     "shogi"
   ],
-  "author": "Google LLC",
+  "author": {
+    "name": "sugyan",
+    "email": "sugi1982@gmail.com",
+    "url": "https://sugyan.com/"
+  },
   "license": "BSD-3-Clause",
   "dependencies": {
     "lit": "^2.1.0"
